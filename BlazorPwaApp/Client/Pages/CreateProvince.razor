@@ -1,0 +1,96 @@
+﻿@page "/createprovince"
+@page "/createprovince/{id:int}"
+@inject IProvinceService ProvinceService
+@inject NavigationManager NavigationManager
+
+@if (Id == null)
+{
+    <PageTitle>Create a new Province</PageTitle>
+   <h3>Create a new Province</h3>
+}
+else
+{
+    <PageTitle>Edit @province.ProvinceName</PageTitle>
+    <h3>Edit @province.ProvinceName</h3>
+}
+
+<EditForm Model="province" OnSubmit="HandleSubmit">
+
+   <div class="mt-3">
+      <label>Country</label><br />
+      <InputSelect @bind-Value="province.CountryId" class="form-select">
+         @foreach (var country in ProvinceService.Countries)
+         {
+            <option value="@country.Oid">@country.CountryName</option>
+         }
+      </InputSelect>
+   </div>
+
+    <div class="mt-3">
+        <label for="provinceName">Province Name</label>
+        <InputText id="provinceName" @bind-Value="province.ProvinceName" class="form-control"></InputText>
+    </div> 
+
+    <br />
+
+   <button type="submit" class="btn btn-primary">@btnText</button>
+   @if (Id != null)
+   {
+      <button type="button" class="btn btn-danger mx-2" @onclick="DeleteProvince">Delete Province</button>
+   }
+   else
+   {
+      <button type="button" class="btn btn-danger mx-2" @onclick="GoToProvincePage">Back</button>
+   }
+</EditForm>
+
+@code {
+   [Parameter]
+   public int? Id { get; set; }
+
+   string btnText = string.Empty;
+
+   //Province province = new Province { Country = new Country() };
+   BlazorPwaApp.Shared.Entities.Province province = new BlazorPwaApp.Shared.Entities.Province { Country = new BlazorPwaApp.Shared.Entities.Country() };
+
+    protected override async Task OnInitializedAsync()
+    {
+        btnText = Id == null ? "Save New Province" : "Update Province";
+        await ProvinceService.GetCountries();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Id == null)
+        {
+            province.Country = ProvinceService.Countries[0];
+            province.CountryId = province.Country.Oid;
+        }
+        else
+        {
+            province = await ProvinceService.GetSingleProvince((int)Id);
+        }
+    }
+
+    async Task HandleSubmit()
+    {
+        if (Id == null)
+        {
+            await ProvinceService.CreateProvince(province);
+        }
+        else
+        {
+            await ProvinceService.UpdateProvince(province);
+        }
+    }
+
+    async Task DeleteProvince()
+    {
+       await ProvinceService.DeleteProvince(province.Oid);
+    }
+
+   private void GoToProvincePage()
+   {
+      NavigationManager.NavigateTo("/Provinces");
+   }
+}

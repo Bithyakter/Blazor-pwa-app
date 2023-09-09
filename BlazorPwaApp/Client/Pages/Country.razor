@@ -1,0 +1,60 @@
+﻿@page "/countries"
+@using BlazorPwaApp.Client.Services.CountryService;
+@inject ICountryService CountryService
+@inject NavigationManager NavigationManager
+
+<PageTitle>Country</PageTitle>
+
+<h3>Countries</h3>
+
+<button class="btn btn-primary" @onclick="CreateNewCountry">Create New Country</button>
+
+<table class="table">
+   <thead>
+      <tr>
+         <th>Country name</th>
+         <th>Country code</th>
+         <th>ISO Code2</th>
+         <th></th>
+      </tr>
+   </thead>
+
+   <tbody>
+      @foreach (var country in CountryService.Countries)
+      {
+         <tr>
+            <td>@country.CountryName</td>
+            <td>@country.CountryCode</td>
+            <td>@country.ISOCode2</td>
+            <td>
+               <button class="btn btn-primary" @onclick="(() => ShowCountry(country.Oid))"><i class="oi oi-pencil"></i></button>
+               <button type="button" class="btn btn-danger mx-2" @onclick="(() => DeleteCountry(country.Oid))"><i class="oi oi-delete"></i></button>
+            </td>
+         </tr>
+      }
+   </tbody>
+</table>
+
+@code {
+
+   protected override async Task OnInitializedAsync()
+   {
+      await CountryService.GetCountries();
+   }
+
+   void ShowCountry(int id)
+   {
+      NavigationManager.NavigateTo($"createcountry/{id}");
+   }
+
+   void CreateNewCountry()
+   {
+      NavigationManager.NavigateTo("/createcountry");
+   }
+
+   async Task DeleteCountry(int countryId)
+   {
+      await CountryService.DeleteCountry(countryId);
+      await CountryService.GetCountries();
+   }
+}

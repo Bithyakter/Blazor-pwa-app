@@ -1,0 +1,58 @@
+﻿@page "/provinces"
+@inject IProvinceService ProvinceService
+@inject NavigationManager NavigationManager
+
+<PageTitle>Provinces</PageTitle>
+
+<h3>Provinces</h3>
+
+<button class="btn btn-primary" @onclick="CreateNewProvince">Create New Province</button>
+
+<table class="table">
+
+   <thead>
+      <tr>
+         <th>Country</th>
+         <th>Province Name</th>         
+         <th></th>
+      </tr>
+   </thead>
+
+   <tbody>
+      @foreach (var province in ProvinceService.Provinces)
+      {
+         <tr>
+            <td>@province.Country.CountryName</td>
+            <td>@province.ProvinceName</td>
+            <td>
+               <button class="btn btn-primary" @onclick="(() => ShowProvince(province.Oid))"><i class="oi oi-pencil"></i></button>
+               <button type="button" class="btn btn-danger mx-2" @onclick="(() => DeleteProvince(province.Oid))"><i class="oi oi-delete"></i></button>
+            </td>
+         </tr>
+      }
+   </tbody>
+
+</table>
+
+@code {
+   protected override async Task OnInitializedAsync()
+   {
+      await ProvinceService.GetProvinces();
+   }
+
+   void ShowProvince(int id)
+   {
+      NavigationManager.NavigateTo($"createprovince/{id}");
+   }
+
+   void CreateNewProvince()
+   {
+      NavigationManager.NavigateTo("/createprovince");
+   }
+
+   async Task DeleteProvince(int provinceId)
+   {
+      await ProvinceService.DeleteProvince(provinceId);
+      await ProvinceService.GetProvinces();
+   }  
+}

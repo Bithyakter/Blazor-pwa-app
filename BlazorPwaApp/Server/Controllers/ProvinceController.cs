@@ -9,11 +9,11 @@ namespace BlazorPwaApp.Server.Controllers
 {
    [Route("api/[controller]")]
    [ApiController]
-   public class ProvincesController : ControllerBase
+   public class ProvinceController : ControllerBase
    {
       private readonly DataContext _context;
 
-      public ProvincesController(DataContext context)
+      public ProvinceController(DataContext context)
       {
          _context = context;
       }
