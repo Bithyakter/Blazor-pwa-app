@@ -2,7 +2,9 @@
 @page "/createcountry/{id:int}"
 @inject ICountryService CountryService
 @inject NavigationManager NavigationManager
-@using BlazorPwaApp.Shared.Entities;
+@using BlazorPwaApp.Shared.Entities
+@using Microsoft.AspNetCore.Components.Forms
+@using static BlazorPwaApp.Client.Services.CountryService.CountryService;
 
 @if (Id == null)
 {
@@ -15,22 +17,29 @@ else
    <h3>Edit @country.CountryName</h3>
 }
 
+@if (!string.IsNullOrEmpty(ErrorMessage))
+{
+   <p class="text-danger">@ErrorMessage</p>
+}
+
 <EditForm Model="country" OnSubmit="HandleSubmit">
+   <DataAnnotationsValidator />
+
    <div class="mt-3">
-      <label for="countryName">Country Name</label>
-      <InputText id="countryName" @bind-Value="country.CountryName" class="form-control"></InputText>
+      <label for="CountryName">Country Name</label>
+      <InputText id="CountryName" @bind-Value="country.CountryName" class="form-control"></InputText>
       <ValidationMessage For="@(() => country.CountryName)" />
    </div>
 
    <div class="mt-3">
-      <label for="countryCode">Country Code</label>
-      <InputText id="countryCode" @bind-Value="country.CountryCode" class="form-control"></InputText>
+      <label for="CountryCode">Country Code</label>
+      <InputText id="CountryCode" @bind-Value="country.CountryCode" class="form-control"></InputText>
       <ValidationMessage For="@(() => country.CountryCode)" />
    </div>
 
    <div class="mt-3">
-      <label for="isoCode2">ISO Code 2</label>
-      <InputText id="isoCode2" @bind-Value="country.ISOCode2" class="form-control"></InputText>
+      <label for="ISOCode2">ISO Code 2</label>
+      <InputText id="ISOCode2" @bind-Value="country.ISOCode2" class="form-control"></InputText>
       <ValidationMessage For="@(() => country.ISOCode2)" />
    </div>
 
@@ -46,6 +55,7 @@ else
    {
       <button type="button" class="btn btn-danger mx-2" @onclick="GoToCountryPage">Back</button>
    }
+
 </EditForm>
 
 @code {
@@ -53,6 +63,7 @@ else
    public int? Id { get; set; }
 
    string btnText = string.Empty;
+   string ErrorMessage = string.Empty;
 
    //Country country = new Country { };
    BlazorPwaApp.Shared.Entities.Country country = new BlazorPwaApp.Shared.Entities.Country();
@@ -77,14 +88,52 @@ else
 
    async Task HandleSubmit()
    {
+      //if (Id == null)
+      //{
+      //   await CountryService.CreateCountry(country);
+      //}
+      //else
+      //{
+      //   await CountryService.UpdateCountry(country);
+      //}
+      //try
+      //{
+      //   if (Id == null)
+      //   {
+      //      await CountryService.CreateCountry(country);
+      //      //ErrorMessage = "Country created successfully!";
+      //      //await Task.Delay(2000);
+      //   }
+      //   else
+      //   {
+      //      await CountryService.UpdateCountry(country);
+      //   }        
+      //}
+      //catch (CountryNotFoundException ex)
+      //{
+      //   ErrorMessage = ex.Message;
+      //}
+      //catch (Exception ex)
+      //{
+      //   ErrorMessage = "An error occurred while creating the country.";
+      //}
+
       if (Id == null)
       {
-         await CountryService.CreateCountry(country);
+         try
+         {
+            await CountryService.CreateCountry(country);
+         }
+         catch (Exception ex)
+         {
+            ErrorMessage = "Required.";
+         }
       }
       else
       {
          await CountryService.UpdateCountry(country);
       }
+
    }
 
    async Task DeleteCountry()

@@ -40,7 +40,7 @@ namespace BlazorPwaApp.Server.Controllers
             var countryInDb = await _context.Countries.FirstOrDefaultAsync(h => h.Oid == id);
 
             if (countryInDb == null)
-               //return NotFound("Sorry, no Country here. :/");
+               //return NotFound("Country not found. :/");
                return StatusCode(StatusCodes.Status404NotFound, MessageConstants.NoMatchFoundError);
 
             return Ok(countryInDb);
@@ -76,7 +76,7 @@ namespace BlazorPwaApp.Server.Controllers
              .FirstOrDefaultAsync(sh => sh.Oid == id);
 
             if (countryInDb == null)
-               //return NotFound("Sorry, but no country for you. :/");
+               //return NotFound("Country not found. :/");
                return StatusCode(StatusCodes.Status404NotFound, MessageConstants.NoMatchFoundError);
 
             countryInDb.CountryName = country.CountryName;
@@ -100,7 +100,7 @@ namespace BlazorPwaApp.Server.Controllers
              .FirstOrDefaultAsync(sh => sh.Oid == id);
 
             if (countryInDb == null)
-               //return NotFound("Sorry, but no country for you. :/");
+               //return NotFound("Country not found. :/");
                return StatusCode(StatusCodes.Status404NotFound, MessageConstants.NoMatchFoundError);
 
             _context.Countries.Remove(countryInDb);

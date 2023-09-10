@@ -12,7 +12,7 @@ namespace BlazorPwaApp.Shared.Entities
       [Key]
       public int Oid { get; set; }
 
-      [Required(ErrorMessage = "The Name field is required.")]
+      [Required(ErrorMessage = "Required")]
 
       public string ProvinceName { get; set; } = string.Empty;
 

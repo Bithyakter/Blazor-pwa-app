@@ -1,6 +1,7 @@
 ﻿using BlazorPwaApp.Shared.Entities;
 using Microsoft.AspNetCore.Components;
 using System.Net.Http.Json;
+using System.Text.Json;
 
 namespace BlazorPwaApp.Client.Services.CountryService
 {
@@ -16,13 +17,17 @@ namespace BlazorPwaApp.Client.Services.CountryService
       }
 
       public List<Country> Countries { get; set; } = new List<Country>();
+      public string ErrorMessage { get; set; }
 
       //CREATE
       public async Task CreateCountry(Country country)
       {
+         if (country == null)
+            throw new CountryNotFoundException();
+
          var result = await _http.PostAsJsonAsync("api/country", country);
          await SetCountries(result);
-      }
+      }     
 
       //UPDATE
       public async Task UpdateCountry(Country country)
@@ -65,5 +70,10 @@ namespace BlazorPwaApp.Client.Services.CountryService
          Countries = response;
          _navigationManager.NavigateTo("countries");
       }
+
+      public class CountryNotFoundException : Exception
+      {
+         public CountryNotFoundException() : base("Country not found!") { }
+      }    
    }
 }
