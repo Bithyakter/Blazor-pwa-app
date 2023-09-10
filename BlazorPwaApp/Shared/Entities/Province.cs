@@ -13,8 +13,7 @@ namespace BlazorPwaApp.Shared.Entities
       public int Oid { get; set; }
 
       [Required(ErrorMessage = "Required")]
-
-      public string ProvinceName { get; set; } = string.Empty;
+      public string ProvinceName { get; set; }
 
       public Country? Country { get; set; }
       public int CountryId { get; set; }

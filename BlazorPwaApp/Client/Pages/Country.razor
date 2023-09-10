@@ -1,6 +1,8 @@
 ﻿@page "/countries"
 @using BlazorPwaApp.Client.Services.CountryService;
+@using static System.Net.WebRequestMethods;
 @inject ICountryService CountryService
+@inject IJSRuntime js
 @inject NavigationManager NavigationManager
 
 <PageTitle>Country</PageTitle>
@@ -28,7 +30,8 @@
             <td>@country.ISOCode2</td>
             <td>
                <button class="btn btn-primary" @onclick="(() => ShowCountry(country.Oid))"><i class="oi oi-pencil"></i></button>
-               <button type="button" class="btn btn-danger mx-2" @onclick="(() => DeleteCountry(country.Oid))"><i class="oi oi-delete"></i></button>
+               @*<button type="button" class="btn btn-danger mx-2" @onclick="(() => DeleteCountry(country.Oid))"><i class="oi oi-delete"></i></button>*@
+               <button type="button" class="btn btn-danger mx-2" @onclick="(() => ConfirmDelete(country.Oid, country.CountryName))"><i class="oi oi-delete"></i></button>
             </td>
          </tr>
       }
@@ -36,6 +39,11 @@
 </table>
 
 @code {
+
+   protected List<Country> list = new List<Country>();
+
+   [Parameter]
+   public string Id { get; set; }
 
    protected override async Task OnInitializedAsync()
    {
@@ -52,9 +60,18 @@
       NavigationManager.NavigateTo("/createcountry");
    }
 
-   async Task DeleteCountry(int countryId)
+   //async Task DeleteCountry(int countryId)
+   //{
+   //   await CountryService.DeleteCountry(countryId);
+   //   await CountryService.GetCountries();
+   //}
+
+   async Task ConfirmDelete(int id, string countryName)
    {
-      await CountryService.DeleteCountry(countryId);
-      await CountryService.GetCountries();
+      if (await js.InvokeAsync<bool>("confirm", $"Do you want to delete {countryName}'s ({id}) Record?"))
+      {
+         await CountryService.DeleteCountry(id);
+         await CountryService.GetCountries();
+      }
    }
 }

@@ -18,25 +18,21 @@ namespace BlazorPwaApp.Client.Services.DistrictService
       public List<District> Districts { get; set; } = new List<District>();
       public List<Province> Provinces { get; set; } = new List<Province>();
 
+      //CREATE
       public async Task CreateDistrict(District district)
       {
          var result = await _http.PostAsJsonAsync("api/district", district);
          await SetDistricts(result);
-      }
+      }      
 
-      private async Task SetDistricts(HttpResponseMessage result)
-      {
-         var response = await result.Content.ReadFromJsonAsync<List<District>>();
-         Districts = response;
-         _navigationManager.NavigateTo("districts");
-      }
-
+      //DELETE
       public async Task DeleteDistrict(int id)
       {
          var result = await _http.DeleteAsync($"api/district/{id}");
          await SetDistricts(result);
       }
 
+      //GET PROVINCE
       public async Task GetProvinces()
       {
          var result = await _http.GetFromJsonAsync<List<Province>>("api/district/provinces");
@@ -45,6 +41,7 @@ namespace BlazorPwaApp.Client.Services.DistrictService
             Provinces = result;
       }
 
+      //GET SINGLE DISTRICT
       public async Task<District> GetSingleDistrict(int id)
       {
          var result = await _http.GetFromJsonAsync<District>($"api/district/{id}");
@@ -55,6 +52,15 @@ namespace BlazorPwaApp.Client.Services.DistrictService
          throw new Exception("District not found!");
       }
 
+      //UPDATE DISTRICT
+
+      public async Task UpdateDistrict(District district)
+      {
+         var result = await _http.PutAsJsonAsync($"api/district/{district.Oid}", district);
+         await SetDistricts(result);
+      }
+
+      //GET DISTRICTS
       public async Task GetDistricts()
       {
          var result = await _http.GetFromJsonAsync<List<District>>("api/district");
@@ -63,10 +69,11 @@ namespace BlazorPwaApp.Client.Services.DistrictService
             Districts = result;
       }
 
-      public async Task UpdateDistrict(District district)
+      private async Task SetDistricts(HttpResponseMessage result)
       {
-         var result = await _http.PutAsJsonAsync($"api/district/{district.Oid}", district);
-         await SetDistricts(result);
+         var response = await result.Content.ReadFromJsonAsync<List<District>>();
+         Districts = response;
+         _navigationManager.NavigateTo("districts");
       }
    }
 }

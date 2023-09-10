@@ -1,0 +1,105 @@
+﻿@page "/createdistrict"
+@page "/createdistrict/{id:int}"
+@inject IDistrictService DistrictService
+@inject NavigationManager NavigationManager
+
+@if (Id == null)
+{
+   <PageTitle>Create a new District</PageTitle>
+   <h3>Create a new District</h3>
+}
+else
+{
+   <PageTitle>Edit @district.DistrictName</PageTitle>
+   <h3>Edit @district.DistrictName</h3>
+}
+
+@if (!string.IsNullOrEmpty(ErrorMessage))
+{
+   <p class="text-danger">@ErrorMessage</p>
+}
+
+<EditForm Model="district" OnSubmit="HandleSubmit">
+   <DataAnnotationsValidator />
+
+   <div class="mt-3">
+      <label>Province</label><br />
+      <InputSelect @bind-Value="district.ProvinceId" class="form-select">
+         @foreach (var province in DistrictService.Provinces)
+         {
+            <option value="@province.Oid">@province.ProvinceName</option>
+         }
+      </InputSelect>
+      <ValidationMessage For="@(() => district.Province.ProvinceName)" />
+   </div>
+
+   <div class="mt-3">
+      <label for="DistrictName">District Name</label>
+      <InputText id="DistrictName" @bind-Value="district.DistrictName" class="form-control"></InputText>
+      <ValidationMessage For="@(() => district.DistrictName)" />
+   </div>
+
+   <br />
+
+   <button type="submit" class="btn btn-primary">@btnText</button>
+   @if (Id != null)
+   {
+      <button type="button" class="btn btn-danger mx-2" @onclick="DeleteDistrict">Delete District</button>
+   }
+   else
+   {
+      <button type="button" class="btn btn-danger mx-2" @onclick="GoToDistrictPage">Back</button>
+   }
+</EditForm>
+
+@code {
+   [Parameter]
+   public int? Id { get; set; }
+
+   string btnText = string.Empty;
+   string ErrorMessage = string.Empty;
+
+   //District district = new District { Province = new Province() };
+   BlazorPwaApp.Shared.Entities.District district = new BlazorPwaApp.Shared.Entities.District { Province = new BlazorPwaApp.Shared.Entities.Province() };
+
+   protected override async Task OnInitializedAsync()
+   {
+      btnText = Id == null ? "Save New District" : "Update District";
+      await DistrictService.GetProvinces();
+   }
+
+   protected override async Task OnParametersSetAsync()
+   {
+      if (Id == null)
+      {
+         district.Province = DistrictService.Provinces[0];
+         district.ProvinceId = district.Province.Oid;
+      }
+      else
+      {
+         district = await DistrictService.GetSingleDistrict((int)Id);
+      }
+   }
+
+   async Task HandleSubmit()
+   {
+      if (Id == null)
+      {
+         await DistrictService.CreateDistrict(district);
+      }
+      else
+      {
+         await DistrictService.UpdateDistrict(district);
+      }
+   }
+
+   async Task DeleteDistrict()
+   {
+      await DistrictService.DeleteDistrict(district.Oid);
+   }
+
+   private void GoToDistrictPage()
+   {
+      NavigationManager.NavigateTo("/Districts");
+   }
+}

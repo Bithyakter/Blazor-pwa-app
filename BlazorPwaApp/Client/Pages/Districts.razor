@@ -1,0 +1,68 @@
+﻿@page "/districts"
+@inject IDistrictService DistrictService
+@inject IJSRuntime js
+@inject NavigationManager NavigationManager
+
+<PageTitle>Districts</PageTitle>
+
+<h3>Districts</h3>
+
+<button class="btn btn-primary" @onclick="CreateNewDistrict">Create New District</button>
+
+<table class="table">
+
+   <thead>
+      <tr>
+         <th>Province</th>
+         <th>District</th>
+         <th></th>
+      </tr>
+   </thead>
+
+   <tbody>
+      @foreach (var district in DistrictService.Districts)
+      {
+         <tr>
+            <td>@district.Province.ProvinceName</td>
+            <td>@district.DistrictName</td>
+            <td>
+               <button class="btn btn-primary" @onclick="(() => ShowDistrict(district.Oid))"><i class="oi oi-pencil"></i></button>
+               <button type="button" class="btn btn-danger mx-2" @onclick="(() => ConfirmDelete(district.Oid, district.DistrictName))"><i class="oi oi-delete"></i></button>
+            </td>
+         </tr>
+      }
+   </tbody>
+
+</table>
+
+@code {
+   protected override async Task OnInitializedAsync()
+   {
+      await DistrictService.GetDistricts();
+   }
+
+   void ShowDistrict(int id)
+   {
+      NavigationManager.NavigateTo($"createdistrict/{id}");
+   }
+
+   void CreateNewDistrict()
+   {
+      NavigationManager.NavigateTo("/createdistrict");
+   }
+
+   //async Task DeleteDistrict(int districtId)
+   //{
+   //   await DistrictService.DeleteDistrict(districtId);
+   //   await DistrictService.GetDistricts();
+   //}
+
+   async Task ConfirmDelete(int id, string districtName)
+   {
+      if (await js.InvokeAsync<bool>("confirm", $"Do you want to delete {districtName}'s ({id}) Record?"))
+      {
+         await DistrictService.DeleteDistrict(id);
+         await DistrictService.GetDistricts();
+      }
+   }
+}

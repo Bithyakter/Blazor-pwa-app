@@ -24,13 +24,6 @@ namespace BlazorPwaApp.Client.Services.FacilityService
          await SetFacilities(result);
       }
 
-      private async Task SetFacilities(HttpResponseMessage result)
-      {
-         var response = await result.Content.ReadFromJsonAsync<List<Facility>>();
-         Facilities = response;
-         _navigationManager.NavigateTo("facilities");
-      }
-
       public async Task DeleteFacility(int id)
       {
          var result = await _http.DeleteAsync($"api/facility/{id}");
@@ -67,6 +60,13 @@ namespace BlazorPwaApp.Client.Services.FacilityService
       {
          var result = await _http.PutAsJsonAsync($"api/facility/{facility.Oid}", facility);
          await SetFacilities(result);
+      }
+
+      private async Task SetFacilities(HttpResponseMessage result)
+      {
+         var response = await result.Content.ReadFromJsonAsync<List<Facility>>();
+         Facilities = response;
+         _navigationManager.NavigateTo("facilities");
       }
    }
 }

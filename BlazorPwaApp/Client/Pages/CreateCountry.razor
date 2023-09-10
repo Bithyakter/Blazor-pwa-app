@@ -1,6 +1,7 @@
 ﻿@page "/createcountry"
 @page "/createcountry/{id:int}"
 @inject ICountryService CountryService
+@inject IJSRuntime JsRuntime
 @inject NavigationManager NavigationManager
 @using BlazorPwaApp.Shared.Entities
 @using Microsoft.AspNetCore.Components.Forms
@@ -71,6 +72,7 @@ else
    protected override async Task OnInitializedAsync()
    {
       btnText = Id == null ? "Save New Country" : "Update Country";
+      
       await CountryService.GetCountries();
    }
 
@@ -123,6 +125,9 @@ else
          try
          {
             await CountryService.CreateCountry(country);
+
+            await JsRuntime.InvokeVoidAsync("alert", "Saved Successfully!");
+            NavigationManager.NavigateTo("countries");
          }
          catch (Exception ex)
          {
@@ -132,8 +137,8 @@ else
       else
       {
          await CountryService.UpdateCountry(country);
+         await JsRuntime.InvokeVoidAsync("alert", "Updated Successfully!");
       }
-
    }
 
    async Task DeleteCountry()

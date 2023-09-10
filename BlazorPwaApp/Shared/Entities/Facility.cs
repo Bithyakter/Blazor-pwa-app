@@ -12,13 +12,18 @@ namespace BlazorPwaApp.Shared.Entities
       [Key]
       public int Oid { get; set; }
 
-      [Required(ErrorMessage = "The Name field is required.")]
+      [Required(ErrorMessage = "Required")]
+      public string FacilityName { get; set; }
 
-      public string FacilityName { get; set; } = string.Empty;
-      public string HMISCode { get; set; } = string.Empty;
-      public string Longitude { get; set; } = string.Empty;
-      public string Latitude { get; set; } = string.Empty;
-      public string IsPrivateFacility { get; set; } = string.Empty;
+      [Required(ErrorMessage = "Required")]
+      public string HMISCode { get; set; }
+
+      public string? Longitude { get; set; }
+
+      public string? Latitude { get; set; }
+
+      public bool IsPrivateFacility { get; set; }
+
       public District? District { get; set; }
       public int DistrictId { get; set; }
    }
