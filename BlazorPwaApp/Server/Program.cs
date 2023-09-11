@@ -13,6 +13,21 @@ builder.Services.AddDbContext<DataContext>(options => options.UseSqlServer(build
 
 var app = builder.Build();
 
+//builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+//        .AddJwtBearer(options =>
+//        {
+//           options.TokenValidationParameters = new TokenValidationParameters
+//           {
+//              ValidateIssuer = true,
+//              ValidateAudience = true,
+//              ValidateLifetime = true,
+//              ValidateIssuerSigningKey = true,
+//              ValidIssuer = Configuration["JwtIssuer"],
+//              ValidAudience = Configuration["JwtIssuer"],
+//              IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["JwtKey"]))
+//           };
+//        });
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {

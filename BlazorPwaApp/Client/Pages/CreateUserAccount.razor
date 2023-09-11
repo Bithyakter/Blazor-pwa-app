@@ -1,0 +1,155 @@
+﻿@page "/createuserAccount"
+@page "/createuserAccount/{id:int}"
+@inject IUserAccountService UserAccountService
+@inject IJSRuntime JsRuntime
+@inject NavigationManager NavigationManager
+@using BlazorPwaApp.Shared.Entities
+@using Microsoft.AspNetCore.Components.Forms
+@using static BlazorPwaApp.Shared.Constants.Enums;
+@using static BlazorPwaApp.Client.Services.UserAccountService.UserAccountService;
+
+@if (Id == null)
+{
+   <PageTitle>Create a new Account</PageTitle>
+   <h3>Create a new Account</h3>
+}
+else
+{
+   <PageTitle>Edit @userAccount.Username</PageTitle>
+   <h3>Edit @userAccount.Username</h3>
+}
+
+@if (!string.IsNullOrEmpty(ErrorMessage))
+{
+   <p class="text-danger">@ErrorMessage</p>
+}
+
+<div class="mb-5">
+
+<EditForm Model="userAccount" OnSubmit="HandleSubmit">
+   <DataAnnotationsValidator />
+
+   <div class="mt-3">
+      <label for="FirstName" class="form-label">First name</label>
+      <InputText id="FirstName" @bind-Value="userAccount.FirstName" class="form-control"></InputText>
+      <ValidationMessage For="@(() => userAccount.FirstName)" />
+   </div>
+
+   <div class="mt-3">
+      <label for="Lastname" class="form-label">Last name</label>
+      <InputText id="Lastname" @bind-Value="userAccount.Lastname" class="form-control"></InputText>
+      <ValidationMessage For="@(() => userAccount.Lastname)" />
+   </div>
+
+   <div class="mt-3">
+      <label for="DOB" class="form-label">Date of birth</label>
+      <InputDate @bind-Value="userAccount.DOB" Format="dd/mm/yyyy" Class="form-control" />
+      <ValidationMessage For="@(() => userAccount.DOB)" />
+   </div>
+
+   <div class="mt-3">
+      <label for="Sex" class="form-label">Sex</label>
+      <InputSelect id="Sex" @bind-Value="userAccount.Sex" class="form-control">
+         @foreach (Sex sex in Enum.GetValues(typeof(Sex)))
+         {
+            <option value="@sex">@sex.ToString()</option>
+         }
+      </InputSelect>
+   </div>
+
+   <div class="mt-3">
+      <label for="Username" class="form-label">Username</label>
+      <InputText id="Username" @bind-Value="userAccount.Username" class="form-control"></InputText>
+      <ValidationMessage For="@(() => userAccount.Username)" />
+   </div>
+
+   <div class="mt-3">
+      <label for="UsePasswordrname" class="form-label">Password</label>
+      <InputText id="Password" @bind-Value="userAccount.Password" class="form-control"></InputText>
+      <ValidationMessage For="@(() => userAccount.Password)" />
+   </div>
+
+   <div class="mt-3">
+      <label for="ConfirmPassword" class="form-label">Confirm Password</label>
+      <InputText id="ConfirmPassword" @bind-Value="userAccount.ConfirmPassword" class="form-control"></InputText>
+      <ValidationMessage For="@(() => userAccount.ConfirmPassword)" />
+   </div>
+
+   <div class="mt-3 mb-5">
+         <button type="submit" class="btn btn-primary">@btnText</button>
+
+         @if (Id != null)
+         {
+            <button type="button" class="btn btn-danger mx-2" @onclick="DeleteUserAccount">Delete UserAccount</button>
+         }
+         else
+         {
+            <button type="button" class="btn btn-danger mx-2" @onclick="GoToUserAccountPage">Back</button>
+         }
+   </div>
+
+</EditForm>
+
+</div>
+
+@code {
+   [Parameter]
+   public int? Id { get; set; }
+
+   string btnText = string.Empty;
+   string ErrorMessage = string.Empty;
+
+   BlazorPwaApp.Shared.Entities.UserAccount userAccount = new BlazorPwaApp.Shared.Entities.UserAccount();
+
+   protected override async Task OnInitializedAsync()
+   {
+      btnText = Id == null ? "Save New UserAccount" : "Update UserAccount";
+
+      await UserAccountService.GetUserAccounts();
+   }
+
+   protected override async Task OnParametersSetAsync()
+   {
+      if (Id == null)
+      {
+         userAccount = new BlazorPwaApp.Shared.Entities.UserAccount();
+      }
+      else
+      {
+         userAccount = await UserAccountService.GetUserAccountByKey((int)Id);
+      }
+   }
+
+   async Task HandleSubmit()
+   {
+      if (Id == null)
+      {
+         try
+         {
+            await UserAccountService.CreateUserAccount(userAccount);
+
+            await JsRuntime.InvokeVoidAsync("alert", "Saved Successfully!");
+            NavigationManager.NavigateTo("userAccounts");
+         }
+         catch (Exception ex)
+         {
+            ErrorMessage = "Required.";
+         }
+      }
+      else
+      {
+         await UserAccountService.UpdateUserAccount(userAccount);
+         await JsRuntime.InvokeVoidAsync("alert", "Updated Successfully!");
+      }
+   }
+
+   async Task DeleteUserAccount()
+   {
+      await UserAccountService.DeleteUserAccount(userAccount.Oid);
+   }
+
+   private void GoToUserAccountPage()
+   {
+      NavigationManager.NavigateTo("/UserAccounts");
+   }
+}

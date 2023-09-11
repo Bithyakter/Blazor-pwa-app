@@ -52,7 +52,7 @@ namespace BlazorPwaApp.Server.Controllers
       }
 
       [HttpPost]
-      public async Task<ActionResult<List<Country>>> CreateComic(Country country)
+      public async Task<ActionResult<List<Country>>> CreateCountry(Country country)
       {
          try
          {

@@ -1,0 +1,76 @@
+﻿@page "/userAccounts"
+@using BlazorPwaApp.Client.Services.UserAccountService;
+@using static System.Net.WebRequestMethods;
+@inject IUserAccountService UserAccountService
+@inject IJSRuntime js
+@inject NavigationManager NavigationManager
+
+<PageTitle>User Accounts</PageTitle>
+
+<h3>User Accounts</h3>
+
+<button class="btn btn-primary" @onclick="CreateNewUserAccount">Create New User Account</button>
+
+<table class="table">
+   <thead>
+      <tr>
+         <th>First name</th>
+         <th>Last name</th>
+         <th>Username</th>
+         <th>Date of birth</th>
+         <th>Sex</th>
+         <th>Password</th>
+         <th></th>
+      </tr>
+   </thead>
+
+   <tbody>
+      @foreach (var user in UserAccountService.UserAccounts)
+      {
+         <tr>
+            <td>@user.FirstName</td>
+            <td>@user.Lastname</td>
+            <td>@user.Username</td>
+            <td>@user.DOB?.ToString("dd/MM/yy")</td>
+            <td>@user.Sex</td>
+            <td>@user.Password</td>
+            <td>
+               <button class="btn btn-primary" @onclick="(() => ShowUserAccount(user.Oid))"><i class="oi oi-pencil"></i></button>
+               <button type="button" class="btn btn-danger mx-2" @onclick="(() => ConfirmDelete(user.Oid, user.Username))"><i class="oi oi-delete"></i></button>
+            </td>
+         </tr>
+      }
+   </tbody>
+</table>
+
+@code {
+
+   protected List<UserAccounts> list = new List<UserAccounts>();
+
+   [Parameter]
+   public string Id { get; set; }
+
+   protected override async Task OnInitializedAsync()
+   {
+      await UserAccountService.GetUserAccounts();
+   }
+
+   void ShowUserAccount(int id)
+   {
+      NavigationManager.NavigateTo($"createuserAccount/{id}");
+   }
+
+   void CreateNewUserAccount()
+   {
+      NavigationManager.NavigateTo("/createuserAccount");
+   }
+
+   async Task ConfirmDelete(int id, string user)
+   {
+      if (await js.InvokeAsync<bool>("confirm", $"Do you want to delete {user}'s ({id}) Record?"))
+      {
+         await UserAccountService.DeleteUserAccount(id);
+         await UserAccountService.GetUserAccounts();
+      }
+   }
+}

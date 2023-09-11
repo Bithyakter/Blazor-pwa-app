@@ -11,8 +11,13 @@ namespace BlazorPwaApp.Server.AppDbContext
       }
 
       public DbSet<Country> Countries { get; set; }
+
       public DbSet<Province> Provinces { get; set; }
+
       public DbSet<District> Districts { get; set; }
+
       public DbSet<Facility> Facilities { get; set; }
+
+      public DbSet<UserAccount> UserAccounts { get; set; }
    }
 }
