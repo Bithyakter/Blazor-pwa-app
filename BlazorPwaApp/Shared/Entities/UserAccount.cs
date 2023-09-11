@@ -28,6 +28,8 @@ namespace BlazorPwaApp.Shared.Entities
       public string Username { get; set; }
 
       [Required(ErrorMessage = MessageConstants.PasswordLengthError)]
+      //[RegularExpression(@"^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$",
+      //      ErrorMessage = "Password should have minimum 8 characters, at least 1 uppercase letter, 1 lowercase letter and 1 number.")]
       [Display(Name = "Password")]
       [DataType(DataType.Password)]
       public string Password { get; set; }

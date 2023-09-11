@@ -13,6 +13,20 @@ builder.Services.AddDbContext<DataContext>(options => options.UseSqlServer(build
 
 var app = builder.Build();
 
+//builder.Services.AddMvc();
+//builder.Services.AddHttpContextAccessor();
+//builder.Services.AddDistributedMemoryCache();
+//builder.Services.AddAuthentication("Cookies")
+//    .AddCookie("Cookies", config =>
+//    {
+//       config.Cookie.Name = "__SCinfo__";
+//       config.LoginPath = "/";
+//       config.SlidingExpiration = true;
+//    });
+
+//builder.Services.AddSession();
+//builder.Services.AddSession(options => { options.IdleTimeout = TimeSpan.FromMinutes(240); });
+
 //builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 //        .AddJwtBearer(options =>
 //        {

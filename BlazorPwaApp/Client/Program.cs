@@ -29,4 +29,5 @@ builder.Services.AddScoped<IDistrictService, DistrictService>();
 builder.Services.AddScoped<IFacilityService, FacilityService>();
 builder.Services.AddScoped<IUserAccountService, UserAccountService>();
 
+//builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://staging-sc.api.arcapps.org/sc-api/") });
 await builder.Build().RunAsync();

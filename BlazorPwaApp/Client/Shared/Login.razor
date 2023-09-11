@@ -1,0 +1,172 @@
+﻿@page "/login"
+@layout CustomLayout
+@inject NavigationManager NavigationManager
+@using System.ComponentModel.DataAnnotations
+
+<PageTitle>Login</PageTitle>
+
+<div class="section">
+   <div class="row m-0">
+
+      <!--BRAND LOGO-->
+      <a class="brand-logo" href="#">
+         <span class="card-title d-lg-block fs-2 fw-bolder">Blazor App</span>
+      </a>
+      <!--/BRAND LOGO-->
+      <!-- LEFT IMAGE-->
+      @*<div class="d-none d-lg-flex col-lg-8 align-items-center pe-5 ps-5 pb-5 pt-5 img-size">
+      <div class="w-100 d-lg-flex align-items-center justify-content-center">
+      <img class="img-fluid img-responsive" width="80%" src="/images/admin-login1.png">
+      </div>
+      </div>*@
+
+      <!-- /LEFT IMAGE-->
+      <!--LOGIN-->
+      <div class="d-flex col-lg-4 align-items-center auth-bg px-2 p-lg-2">
+         <div class="col-10 col-sm-8 col-md-6 col-lg-10 px-xl-2 mx-auto">
+            <!--CARD-->
+            <div class="card shadow-2-strong mb-2" style="border-radius: 1rem;">
+               <div class="card-body">
+
+                  <!--HEADER-->
+                  <div class="pb-2 mt-3">
+                     @* <a class="brand-logo d-flex justify-content-center pb-0 mb-0" href="#">
+                     <img src="/images/Logo.ico" alt="logo" style="width:90px;" />
+                     </a>*@
+                     <h4 class="card-title text-center pb-0 fw-bolder fs-sm-5 ">Login to Smart Care Admin</h4>
+                     <p class="text-center small">Enter your <strong>Username</strong>  & <strong>Password</strong> to Login.</p>
+                  </div>
+
+                  <form class="row g-3" method="post" @onsubmit="OnSubmit">
+
+                     <!--USERNAME-->
+                     <div class="col-12 form-floating">
+
+                        <div class="form-floating mt-2">
+                           <input asp-for="Username" type="text" class="form-control" data-val="true" data-val-required="Required." data-val-length-max="60" data-val-length-min="2" data-val-length="Username should be atleast 2 characters." placeholder="First name" onkeypress="return IsAlphabat(event,this);">
+                           <label asp-for="Username" class="">Username</label>
+                           <span asp-validation-for="Username" class="text-danger"></span>
+                        </div>
+                     </div>
+
+                     <!--PASSWORD-->
+                     <div class="col-12 form-floating">
+                        <div class="col-12 form-floating mb-2">
+                           <div class="input-group">
+                              <input asp-for="Password" type="password" class="form-control required p-3" placeholder="Password">
+                              <span class="input-group-text" id="eye"><i class="bi bi-eye"></i></span>
+                           </div>
+                           <span asp-validation-for="Password" class="text-danger"></span>
+                        </div>
+                     </div>
+
+                     <!--ACTION-->
+                     <div class="col-12 mb-2 mt-2">
+                        <button class="btn btn-primary w-100 p-2" type="submit" @onclick="OnSubmit">Login</button>
+                     </div>
+
+                  </form>
+
+                  @*<EditForm class="row g-3" Model="@loginModel" OnValidSubmit="HandleLogin">
+                  <DataAnnotationsValidator />
+
+                  <!--USERNAME-->
+                  <div class="col-12 form-floating">
+
+                  <div class="form-floating mt-2">
+                  <InputText id="username" @bind-Value="@loginModel.Username" type="text" class="form-control" />
+                  <label for="username" class="">Username</label>
+                  <ValidationMessage For="@(() => loginModel.Username)" />
+                  </div>
+                  </div>
+
+                  <!--PASSWORD-->
+                  <div class="col-12 form-floating">
+                  <div class="col-12 form-floating mb-2">
+                  <div class="input-group">
+                  <InputText id="password" type="password" class="form-control required p-3" @bind-Value="@loginModel.Password" />
+                  <span class="input-group-text" id="eye"><i class="bi bi-eye"></i></span>
+                  </div>
+                  <ValidationMessage For="@(() => loginModel.Password)" />
+                  </div>
+                  </div>
+
+                  <!--ACTION-->
+                  <div class="col-12 mb-2 mt-2">
+                  <button class="btn btn-primary w-100 p-2" type="submit">Login</button>
+                  </div>
+
+                  </EditForm>*@
+
+               </div>
+            </div>
+            <!--/CARD-->
+            @* <!--FOOTER-->
+            <footer id="footerLogo" class="footerLogo">
+            <div class="copyright">
+            <div class="row mt-0 d-flex justify-content-center">
+            <div class="col-12  ">
+            <a class="brand-logo" href="https://www.moh.gov.zm/">
+            <img src="/images/for 1.png" alt="logo" style="width:110px;">
+            </a>
+            <a class="brand-logo" href="https://www.cdc.gov/">
+            <img src="/images/For2.png" alt="logo" style="width:55px;">
+            </a>
+            <a class="brand-logo ps-2" href="http://ihmafrica.org/">
+            <img src="/images/for 3.png" alt="logo" style="width:80px;">
+            </a>
+            </div>
+            </div>
+            </div>
+            </footer>*@
+
+         </div>
+         <!-- /LOGIN-->
+      </div>
+   </div>
+</div>
+
+@code {
+   private async Task OnSubmit()
+   {
+      NavigationManager.NavigateTo("/countries");
+   }
+}
+
+@*@code {
+      private UserLoginDto loginModel = new UserLoginDto();
+      private bool isAuthenticated;
+      private UserAccount currentUser;
+      private bool hasRendered;
+
+      protected override void OnAfterRender(bool firstRender)
+      {
+         if (firstRender && !hasRendered)
+         {
+            hasRendered = true;
+            CheckAuthenticationAndNavigate();
+         }
+      }
+
+      private async Task CheckAuthenticationAndNavigate()
+      {
+         isAuthenticated = await AuthService.IsAuthenticated();
+
+         if (isAuthenticated)
+            NavigationManager.NavigateTo("countries", forceLoad: true);
+      }
+
+      private async Task HandleLogin()
+      {
+         bool isSuccess = await AuthService.Login(loginModel);
+         if (isSuccess)
+         {
+            NavigationManager.NavigateTo("/countries", forceLoad: true);
+         }
+         else
+         {
+            Console.WriteLine("Authentication failed");
+         }
+      }
+}*@
+
