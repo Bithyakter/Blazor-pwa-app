@@ -22,6 +22,16 @@ else
 <EditForm Model="district" OnSubmit="HandleSubmit">
    <DataAnnotationsValidator />
 
+   @*<div class="mt-3">
+      <label>Country</label><br />
+      <select value="district.Province.CountryId" class="form-select">
+         @foreach (var country in DistrictService.Countries)
+         {
+            <option value="@country.Oid">@country.CountryName</option>
+         }
+      </select>
+   </div>
+
    <div class="mt-3">
       <label>Province</label><br />
       <InputSelect @bind-Value="district.ProvinceId" class="form-select">
@@ -30,6 +40,29 @@ else
             <option value="@province.Oid">@province.ProvinceName</option>
          }
       </InputSelect>
+      <ValidationMessage For="@(() => district.Province.ProvinceName)" />
+   </div>*@
+
+   <div class="mt-3">
+      <label>Country</label><br />
+      <select @onchange="OnCountryChange" class="form-select">
+         <option value="">Select a country</option>
+         @foreach (var country in DistrictService.Countries)
+         {
+            <option value="@country.Oid">@country.CountryName</option>
+         }
+      </select>
+   </div>
+
+   <div class="mt-3">
+      <label>Province</label><br />
+      <select @bind="district.ProvinceId" class="form-select">
+         <option value="">Select a province</option>
+         @foreach (var province in DistrictService.Provinces.Where(p => p.CountryId == selectedCountryId))
+         {
+            <option value="@province.Oid">@province.ProvinceName</option>
+         }
+      </select>
       <ValidationMessage For="@(() => district.Province.ProvinceName)" />
    </div>
 
@@ -59,6 +92,8 @@ else
    string btnText = string.Empty;
    string ErrorMessage = string.Empty;
 
+   private int selectedCountryId;
+
    //District district = new District { Province = new Province() };
    BlazorPwaApp.Shared.Entities.District district = new BlazorPwaApp.Shared.Entities.District { Province = new BlazorPwaApp.Shared.Entities.Province() };
 
@@ -66,6 +101,7 @@ else
    {
       btnText = Id == null ? "Save New District" : "Update District";
       await DistrictService.GetProvinces();
+      await DistrictService.GetCountries();
    }
 
    protected override async Task OnParametersSetAsync()
@@ -78,6 +114,7 @@ else
       else
       {
          district = await DistrictService.GetSingleDistrict((int)Id);
+         selectedCountryId = district.Province.CountryId;
       }
    }
 
@@ -101,5 +138,19 @@ else
    private void GoToDistrictPage()
    {
       NavigationManager.NavigateTo("/Districts");
+   }
+
+   private void OnCountryChange(ChangeEventArgs e)
+   {
+      if (int.TryParse(e.Value.ToString(), out int selectedCountryId))
+      {
+         district.ProvinceId = 0; // Reset the selected province when the country changes
+         this.selectedCountryId = selectedCountryId;
+      }
+      else
+      {
+         // Handle the case when the selected value is not a valid integer (e.g., the default option)
+         this.selectedCountryId = 0;
+      }
    }
 }

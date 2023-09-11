@@ -8,9 +8,13 @@ namespace BlazorPwaApp.Client.Services.DistrictService
 
       List<Province> Provinces { get; set; }
 
-      Task GetProvinces();
+      List<Country> Countries { get; set; }
 
       Task GetDistricts();
+
+      Task GetProvinces();     
+
+      Task GetCountries();
 
       Task<District> GetSingleDistrict(int id);
 

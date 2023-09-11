@@ -4,9 +4,17 @@ namespace BlazorPwaApp.Client.Services.FacilityService
 {
    public interface IFacilityService
    {
-      List<Facility> Facilities { get; set; }
+      List<Country> Countries { get; set; }
+
+      List<Province> Provinces { get; set; }   
 
       List<District> Districts { get; set; }
+
+      List<Facility> Facilities { get; set; }
+
+      Task GetCountries();
+
+      Task GetProvinces();
 
       Task GetDistricts();
 

@@ -13,6 +13,8 @@
 
    <thead>
       <tr>
+         <th>Country</th>
+         <th>Province</th>
          <th>District</th>
          <th>Facility</th>
          <th>HMIS Code</th>
@@ -27,6 +29,8 @@
       @foreach (var facility in FacilityService.Facilities)
       {
          <tr>
+            <td>@(facility?.District?.Province?.Country?.CountryName ?? "N/A")</td>
+            <td>@(facility?.District?.Province?.ProvinceName ?? "N/A")</td>
             <td>@facility.District.DistrictName</td>
             <td>@facility.FacilityName</td>
             <td>@facility.HMISCode</td>

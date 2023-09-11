@@ -17,13 +17,14 @@ namespace BlazorPwaApp.Client.Services.DistrictService
 
       public List<District> Districts { get; set; } = new List<District>();
       public List<Province> Provinces { get; set; } = new List<Province>();
+      public List<Country> Countries { get; set; } = new List<Country>();
 
       //CREATE
       public async Task CreateDistrict(District district)
       {
          var result = await _http.PostAsJsonAsync("api/district", district);
          await SetDistricts(result);
-      }      
+      }    
 
       //DELETE
       public async Task DeleteDistrict(int id)
@@ -39,6 +40,15 @@ namespace BlazorPwaApp.Client.Services.DistrictService
 
          if (result != null)
             Provinces = result;
+      }
+
+      //GET COUNTRY
+      public async Task GetCountries()
+      {
+         var result = await _http.GetFromJsonAsync<List<Country>>("api/district/countries");
+
+         if (result != null)
+            Countries = result;
       }
 
       //GET SINGLE DISTRICT

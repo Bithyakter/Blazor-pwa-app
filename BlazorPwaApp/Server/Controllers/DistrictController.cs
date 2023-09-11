@@ -23,7 +23,7 @@ namespace BlazorPwaApp.Server.Controllers
       {
          try
          {
-            var districtInDb = await _context.Districts.Include(p => p.Province).ToListAsync();
+            var districtInDb = await _context.Districts.Include(p => p.Province).Include(p => p.Province.Country).ToListAsync();
             return Ok(districtInDb);
          }
          catch (Exception ex)
@@ -39,6 +39,20 @@ namespace BlazorPwaApp.Server.Controllers
          {
             var provinceInDb = await _context.Provinces.ToListAsync();
             return Ok(provinceInDb);
+         }
+         catch (Exception ex)
+         {
+            return StatusCode(StatusCodes.Status500InternalServerError, MessageConstants.GenericError);
+         }
+      }
+
+      [HttpGet("countries")]
+      public async Task<ActionResult<List<Country>>> GetCountries()
+      {
+         try
+         {
+            var countryInDb = await _context.Countries.ToListAsync();
+            return Ok(countryInDb);
          }
          catch (Exception ex)
          {

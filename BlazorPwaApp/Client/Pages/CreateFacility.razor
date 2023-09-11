@@ -1,5 +1,6 @@
 ﻿@page "/createfacility"
 @page "/createfacility/{id:int}"
+@using BlazorPwaApp.Shared.Entities;
 @inject IFacilityService FacilityService
 @inject NavigationManager NavigationManager
 
@@ -23,14 +24,36 @@ else
    <DataAnnotationsValidator />
 
    <div class="mt-3">
+      <label>Country</label><br />
+      <select @onchange="OnCountryChange" class="form-select">
+         <option value="">Select a country</option>
+         @foreach (var country in FacilityService.Countries)
+         {
+            <option value="@country.Oid">@country.CountryName</option>
+         }
+      </select>
+   </div>
+
+   <div class="mt-3">
+      <label>Province</label><br />
+      <select @onchange="OnProvinceChange" class="form-select">
+         <option value="">Select a province</option>
+         @foreach (var province in FacilityService.Provinces.Where(p => p.CountryId == selectedCountryId))
+         {
+            <option value="@province.Oid">@province.ProvinceName</option>
+         }
+      </select>
+   </div>
+
+   <div class="mt-3">
       <label>District</label><br />
-      <InputSelect @bind-Value="facility.DistrictId" class="form-select">
-         @foreach (var district in FacilityService.Districts)
+      <select @bind="facility.DistrictId" class="form-select">
+         <option value="">Select a district</option>
+         @foreach (var district in FacilityService.Districts.Where(d => d.ProvinceId == selectedProvinceId))
          {
             <option value="@district.Oid">@district.DistrictName</option>
          }
-      </InputSelect>
-      <ValidationMessage For="@(() => facility.District.DistrictName)" />
+      </select>
    </div>
 
    <div class="mt-3">
@@ -83,25 +106,31 @@ else
    string btnText = string.Empty;
    string ErrorMessage = string.Empty;
 
-   //Facility facility = new Facility { District = new District() };
-   BlazorPwaApp.Shared.Entities.Facility facility = new BlazorPwaApp.Shared.Entities.Facility { District = new BlazorPwaApp.Shared.Entities.District() };
+   private int selectedCountryId;
+   private int selectedProvinceId;
+
+   Facility facility = new Facility { District = new District() };
 
    protected override async Task OnInitializedAsync()
    {
       btnText = Id == null ? "Save New Facility" : "Update Facility";
       await FacilityService.GetDistricts();
+      await FacilityService.GetProvinces();
+      await FacilityService.GetCountries();
    }
 
    protected override async Task OnParametersSetAsync()
    {
       if (Id == null)
       {
-         facility.District = FacilityService.Districts[0];
-         facility.DistrictId = facility.District.Oid;
+         facility.District = FacilityService.Districts.FirstOrDefault();
+         facility.DistrictId = facility.District?.Oid ?? 0;
       }
       else
       {
          facility = await FacilityService.GetSingleFacility((int)Id);
+         selectedCountryId = facility.District?.Province?.CountryId ?? 0;
+         selectedProvinceId = facility.District?.ProvinceId ?? 0;
       }
    }
 
@@ -125,5 +154,32 @@ else
    private void GoToFacilityPage()
    {
       NavigationManager.NavigateTo("/Facilities");
+   }
+
+   private void OnCountryChange(ChangeEventArgs e)
+   {
+      if (int.TryParse(e.Value.ToString(), out int newCountryId))
+      {
+         selectedCountryId = newCountryId;
+         facility.District.ProvinceId = 0;
+         facility.DistrictId = 0;
+      }
+      else
+      {
+         selectedCountryId = 0;
+      }
+   }
+
+   private async Task OnProvinceChange(ChangeEventArgs e)
+   {
+      if (int.TryParse(e.Value.ToString(), out int newProvinceId))
+      {
+         selectedProvinceId = newProvinceId;
+         facility.DistrictId = 0;
+      }
+      else
+      {
+         selectedProvinceId = 0;
+      }
    }
 }

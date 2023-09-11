@@ -23,7 +23,7 @@ namespace BlazorPwaApp.Server.Controllers
       {
          try
          {
-            var facilityInDb = await _context.Facilities.Include(p => p.District).ToListAsync();
+            var facilityInDb = await _context.Facilities.Include(p => p.District).ThenInclude(d => d.Province).ThenInclude(p => p.Country).ToListAsync();
             return Ok(facilityInDb);
          }
          catch (Exception ex)

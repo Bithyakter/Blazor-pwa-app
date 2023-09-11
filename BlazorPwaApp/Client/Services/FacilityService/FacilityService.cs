@@ -17,6 +17,8 @@ namespace BlazorPwaApp.Client.Services.FacilityService
 
       public List<Facility> Facilities { get; set; } = new List<Facility>();
       public List<District> Districts { get; set; } = new List<District>();
+      public List<Province> Provinces { get; set; } = new List<Province>();
+      public List<Country> Countries { get; set; } = new List<Country>();
 
       public async Task CreateFacility(Facility facility)
       {
@@ -28,6 +30,22 @@ namespace BlazorPwaApp.Client.Services.FacilityService
       {
          var result = await _http.DeleteAsync($"api/facility/{id}");
          await SetFacilities(result);
+      }
+
+      public async Task GetProvinces()
+      {
+         var result = await _http.GetFromJsonAsync<List<Province>>("api/province");
+
+         if (result != null)
+            Provinces = result;
+      }
+
+      public async Task GetCountries()
+      {
+         var result = await _http.GetFromJsonAsync<List<Country>>("api/country");
+
+         if (result != null)
+            Countries = result;
       }
 
       public async Task GetDistricts()
