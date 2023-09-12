@@ -1,4 +1,5 @@
-﻿using BlazorPwaApp.Shared.Entities;
+﻿using BlazorPwaApp.Shared.Dto;
+using BlazorPwaApp.Shared.Entities;
 
 namespace BlazorPwaApp.Client.Services.UserAccountService
 {
@@ -15,5 +16,7 @@ namespace BlazorPwaApp.Client.Services.UserAccountService
       Task UpdateUserAccount(UserAccount userAccount);
 
       Task DeleteUserAccount(int id);
+
+      Task<UserAccount> UserLogin(LoginDto login);
    }
 }

@@ -1,6 +1,6 @@
 ﻿using BlazorPwaApp.Server.AppDbContext;
-using BlazorPwaApp.Server.Dto;
 using BlazorPwaApp.Shared.Constants;
+using BlazorPwaApp.Shared.Dto;
 using BlazorPwaApp.Shared.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -31,6 +31,10 @@ namespace BlazorPwaApp.Server.Controllers
       {
          try
          {
+            EncryptionHelpers encryptionHelpers = new EncryptionHelpers();
+            string encryptedPassword = encryptionHelpers.Encrypt(userAccount.Password);
+            userAccount.Password = encryptedPassword;
+
             _context.UserAccounts.Add(userAccount);
             await _context.SaveChangesAsync();
 
@@ -123,17 +127,86 @@ namespace BlazorPwaApp.Server.Controllers
       }
 
       //[HttpPost]
-      //public async Task<IActionResult> Login(LoginDto login)
+      //public async Task<IActionResult> UserLogin(LoginDto login)
       //{
       //   try
       //   {
+      //      var userInDb = await _context.UserAccounts.GetUserByUserNamePassword(login.Username, login.Password);
 
+      //      if (userInDb != null)
+      //      {
+      //         return Ok(user);
+      //      }
+      //      else
+      //      {
+      //         return StatusCode(StatusCodes.Status404NotFound, MessageConstants.NoMatchFoundError);
+      //      }
       //   }
       //   catch (Exception ex)
       //   {
-      //      return BadRequest(ex.Message);
+      //      return StatusCode(StatusCodes.Status500InternalServerError, MessageConstants.GenericError);
       //   }
       //}
+
+      [HttpPost("userLogin")]
+      public async Task<IActionResult> UserLogin(LoginDto login)
+      {
+         try
+         {
+            EncryptionHelpers encryptionHelpers = new EncryptionHelpers();
+            string encryptedPassword = encryptionHelpers.Encrypt(login.Password);
+
+            var userInDb = await _context.UserAccounts.SingleOrDefaultAsync(u =>u.Username == login.Username && u.Password == encryptedPassword);
+
+            if (userInDb != null)
+               return Ok(userInDb);
+            else
+               return StatusCode(StatusCodes.Status404NotFound, MessageConstants.NoMatchFoundError);
+         }
+         catch (Exception ex)
+         {
+            return StatusCode(StatusCodes.Status500InternalServerError, MessageConstants.GenericError);
+         }
+      }
+
+      private async Task<List<UserAccount>> GetDbUserAccounts()
+      {
+         return await _context.UserAccounts.ToListAsync();
+      }
+
+      [HttpPost("change-password")]
+      public async Task<IActionResult> ChangedPassword(ChangedPasswordDto changePassword)
+      {
+         try
+         {
+            var userInDb = await _context.UserAccounts.SingleOrDefaultAsync(p =>p.Username == changePassword.Username && p.Password == changePassword.Password);
+
+            if (userInDb.Password == changePassword.Password)
+            {
+               if (userInDb != null)
+               {
+                  userInDb.Password = changePassword.ConfirmPassword;
+
+                  _context.UserAccounts.Update(userInDb);
+                  await _context.SaveChangesAsync();
+
+                  return Ok();
+               }
+               else
+               {
+                  return StatusCode(StatusCodes.Status404NotFound, MessageConstants.NoMatchFoundError);
+               }
+            }
+            else
+            {
+               return StatusCode(StatusCodes.Status404NotFound, MessageConstants.NoMatchFoundError);
+            }
+         }
+         catch (Exception ex)
+         {
+            return StatusCode(StatusCodes.Status500InternalServerError, MessageConstants.GenericError);
+         }
+      }
 
       //[HttpPost("login")]
       //public async Task<IActionResult> Login(LoginDto login)
@@ -180,24 +253,6 @@ namespace BlazorPwaApp.Server.Controllers
       //      return BadRequest(ex.Message);
       //   }
       //}
-
-      private async Task<List<UserAccount>> GetDbUserAccounts()
-      {
-         return await _context.UserAccounts.ToListAsync();
-      }
-
-      public UserAccount? GetUserByUserName(string UserName)
-      {
-         try
-         {
-            var user = _context.UserAccounts.AsNoTracking().FirstOrDefault(x => x.Username == UserName);
-            return user;
-         }
-         catch (Exception)
-         {
-            throw;
-         }
-      }
 
       //private string GenerateJwtToken(UserAccount user)
       //{
@@ -254,11 +309,5 @@ namespace BlazorPwaApp.Server.Controllers
 
       //   return BadRequest(new { Message = "Login failed" });
       //}
-
-      //UserAccount? GetUserByuserNameAndpassword(string UserName, string Password);
-
-      //UserAccount? GetUserByuserName(string UserName);      
-
-      //UserAccount IsLogin(int FacilitiesId, string userName, string password);
    }
 }

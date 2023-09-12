@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace BlazorPwaApp.Server.Dto
+namespace BlazorPwaApp.Shared.Dto
 {
    public class LoginDto
    {

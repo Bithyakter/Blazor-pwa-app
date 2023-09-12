@@ -1,5 +1,9 @@
 ﻿@page "/login"
 @layout CustomLayout
+@using BlazorPwaApp.Shared.Entities
+@using BlazorPwaApp.Shared.Dto
+@inject IUserAccountService UserAccountService
+@inject IJSRuntime JsRuntime
 @inject NavigationManager NavigationManager
 @using System.ComponentModel.DataAnnotations
 
@@ -37,7 +41,7 @@
                      <p class="text-center small">Enter your <strong>Username</strong>  & <strong>Password</strong> to Login.</p>
                   </div>
 
-                  <form class="row g-3" method="post" @onsubmit="OnSubmit">
+                  @*<form class="row g-3" method="post" @onsubmit="OnSubmit">
 
                      <!--USERNAME-->
                      <div class="col-12 form-floating">
@@ -65,38 +69,49 @@
                         <button class="btn btn-primary w-100 p-2" type="submit" @onclick="OnSubmit">Login</button>
                      </div>
 
-                  </form>
+                  </form>*@
 
-                  @*<EditForm class="row g-3" Model="@loginModel" OnValidSubmit="HandleLogin">
+                  <EditForm class="row g-3" Model="@login" OnValidSubmit="HandleLogin">
                   <DataAnnotationsValidator />
 
-                  <!--USERNAME-->
-                  <div class="col-12 form-floating">
+                     <!--USERNAME-->
+                     <div class="col-12 form-floating">
 
-                  <div class="form-floating mt-2">
-                  <InputText id="username" @bind-Value="@loginModel.Username" type="text" class="form-control" />
-                  <label for="username" class="">Username</label>
-                  <ValidationMessage For="@(() => loginModel.Username)" />
-                  </div>
-                  </div>
+                     <div class="form-floating mt-2">
+                           <InputText id="Username" @bind-Value="@login.Username" type="text" class="form-control" />
+                           <label for="Username" class="">Username</label>
+                           <ValidationMessage For="@(() => login.Username)" />
+                        </div>
+                     </div>
 
-                  <!--PASSWORD-->
-                  <div class="col-12 form-floating">
-                  <div class="col-12 form-floating mb-2">
-                  <div class="input-group">
-                  <InputText id="password" type="password" class="form-control required p-3" @bind-Value="@loginModel.Password" />
-                  <span class="input-group-text" id="eye"><i class="bi bi-eye"></i></span>
-                  </div>
-                  <ValidationMessage For="@(() => loginModel.Password)" />
-                  </div>
-                  </div>
+                     <!--PASSWORD-->
+                     <div class="col-12 form-floating">
+                        <div class="col-12 form-floating mb-2">
+                           <div class="input-group">
+                                 <InputText id="password" type="password" class="form-control required p-3" @bind-Value="@login.Password" />
+                                 <span class="input-group-text" id="eye"><i class="bi bi-eye"></i></span>
+                           </div>
+                           <ValidationMessage For="@(() => login.Password)" />
+                        </div>
+                     </div>
 
-                  <!--ACTION-->
-                  <div class="col-12 mb-2 mt-2">
-                  <button class="btn btn-primary w-100 p-2" type="submit">Login</button>
-                  </div>
+                     <!--PASSWORD-->
+                     <div class="col-12 form-floating">
+                        <div class="col-12 form-floating mb-2">
+                           <div class="input-group">
+                              <InputText id="ConfirmPassword" type="ConfirmPassword" class="form-control required p-3" @bind-Value="@login.ConfirmPassword" />
+                              <span class="input-group-text" id="eye"><i class="bi bi-eye"></i></span>
+                           </div>
+                           <ValidationMessage For="@(() => login.ConfirmPassword)" />
+                        </div>
+                     </div>
 
-                  </EditForm>*@
+                     <!--ACTION-->
+                     <div class="col-12 mb-2 mt-2">
+                        <button class="btn btn-primary w-100 p-2" type="submit">Login</button>
+                     </div>
+
+                  </EditForm>
 
                </div>
             </div>
@@ -126,20 +141,37 @@
    </div>
 </div>
 
-@code {
+@*@code {
    private async Task OnSubmit()
    {
       NavigationManager.NavigateTo("/countries");
    }
-}
+}*@
 
-@*@code {
-      private UserLoginDto loginModel = new UserLoginDto();
+@code {
+      private LoginDto login = new LoginDto();
       private bool isAuthenticated;
       private UserAccount currentUser;
       private bool hasRendered;
 
-      protected override void OnAfterRender(bool firstRender)
+      private async Task HandleLogin()
+      {
+         var isSuccess = await UserAccountService.UserLogin(login);
+         
+         if (isSuccess != null)
+         {
+            await JsRuntime.InvokeVoidAsync("alert", "Login Successfully!");
+            NavigationManager.NavigateTo("countries");
+         }
+         else
+         {
+            Console.WriteLine("Authentication failed");
+         }
+      }
+}
+
+@*
+       protected override void OnAfterRender(bool firstRender)
       {
          if (firstRender && !hasRendered)
          {
@@ -155,18 +187,4 @@
          if (isAuthenticated)
             NavigationManager.NavigateTo("countries", forceLoad: true);
       }
-
-      private async Task HandleLogin()
-      {
-         bool isSuccess = await AuthService.Login(loginModel);
-         if (isSuccess)
-         {
-            NavigationManager.NavigateTo("/countries", forceLoad: true);
-         }
-         else
-         {
-            Console.WriteLine("Authentication failed");
-         }
-      }
-}*@
-
+*@

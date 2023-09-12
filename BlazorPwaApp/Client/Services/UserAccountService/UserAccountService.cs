@@ -1,5 +1,9 @@
-﻿using BlazorPwaApp.Shared.Entities;
+﻿using BlazorPwaApp.Shared.Constants;
+using BlazorPwaApp.Shared.Dto;
+using BlazorPwaApp.Shared.Entities;
 using Microsoft.AspNetCore.Components;
+using System.Net.Http;
+using System.Net;
 using System.Net.Http.Json;
 
 namespace BlazorPwaApp.Client.Services.UserAccountService
@@ -74,6 +78,44 @@ namespace BlazorPwaApp.Client.Services.UserAccountService
       public class UserAccountNotFoundException : Exception
       {
          public UserAccountNotFoundException() : base("UserAccount not found!") { }
+      }
+
+      public async Task<UserAccount> UserLogin(LoginDto login)
+      {
+         try
+         {
+            var response = await _http.PostAsJsonAsync("api/userAccount/userLogin", login);
+
+            if (response.IsSuccessStatusCode)
+            {
+               return await response.Content.ReadFromJsonAsync<UserAccount>();
+            }
+            else if (response.StatusCode == HttpStatusCode.NotFound)
+            {
+               throw new ApiException(MessageConstants.NoMatchFoundError);
+            }
+            else
+            {
+               throw new ApiException(MessageConstants.GenericError);
+            }
+         }
+         catch (HttpRequestException ex)
+         {
+            // Handle any network-related errors
+            throw new ApiException("Network Error: Unable to communicate with the server.", ex);
+         }
+      }
+   }
+
+   // ApiException.cs (Custom Exception)
+   public class ApiException : Exception
+   {
+      public ApiException(string? message) : base(message)
+      {
+      }
+
+      public ApiException(string message, HttpRequestException ex) : base(message)
+      {
       }
    }
 }

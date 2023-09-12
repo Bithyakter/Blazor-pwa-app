@@ -69,7 +69,7 @@ else
                   <label class="control-label col-md-12">Date of birth</label>
                   <div class="col">
                      <InputDate @bind-Value="userAccount.DOB" Format="dd/mm/yyyy" Class="form-control" />
-                     <ValidationMessage For="@(() => userAccount.Username)" />
+                     <ValidationMessage For="@(() => userAccount.DOB)" />
                   </div>
                </div>
 
@@ -156,7 +156,7 @@ else
          }
          catch (Exception ex)
          {
-            ErrorMessage = "Required.";
+            ErrorMessage = "Please fill in all required fields.";
          }
       }
       else
@@ -164,7 +164,7 @@ else
          await UserAccountService.UpdateUserAccount(userAccount);
          await JsRuntime.InvokeVoidAsync("alert", "Updated Successfully!");
       }
-   }
+   } 
 
    async Task DeleteUserAccount()
    {

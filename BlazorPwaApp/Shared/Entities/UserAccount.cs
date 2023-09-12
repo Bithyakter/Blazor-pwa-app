@@ -15,18 +15,22 @@ namespace BlazorPwaApp.Shared.Entities
       [Key]
       public int Oid { get; set; }
 
-      [Required(ErrorMessage = MessageConstants.RequiredFieldError)]
+      [Required(ErrorMessage = "First Name is required.")]
       public string FirstName { get; set; }
 
-      [Required(ErrorMessage = MessageConstants.RequiredFieldError)]
+      [Required(ErrorMessage = "Last Name is required.")]
       public string Lastname { get; set; }
 
+      [Required(ErrorMessage = "Dob is required.")]
       public DateTime? DOB { get; set; }
 
+      [Required(ErrorMessage = "Sex is required.")]
       public Sex Sex { get; set; }
 
+      [Required(ErrorMessage = "user Name is required.")]
       public string Username { get; set; }
 
+      //[Required(ErrorMessage = "Password is required.")]
       [Required(ErrorMessage = MessageConstants.PasswordLengthError)]
       //[RegularExpression(@"^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$",
       //      ErrorMessage = "Password should have minimum 8 characters, at least 1 uppercase letter, 1 lowercase letter and 1 number.")]
@@ -35,7 +39,7 @@ namespace BlazorPwaApp.Shared.Entities
       public string Password { get; set; }
 
       [NotMapped]
-      [Required(ErrorMessage = MessageConstants.RequiredFieldError)]
+      [Required(ErrorMessage = "Confirm password is required.")]
       [Compare("Password", ErrorMessage = MessageConstants.PasswordMatchError)]
       [Display(Name = "Confirm password")]
       [DataType(DataType.Password)]
