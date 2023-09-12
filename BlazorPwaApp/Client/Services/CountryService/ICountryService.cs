@@ -6,7 +6,8 @@ namespace BlazorPwaApp.Client.Services.CountryService
    {
       List<Country> Countries { get; set; }
 
-      Task GetCountries();
+      //Task GetCountries();
+      Task<List<Country>> GetCountries();
 
       Task<Country> GetSingleCountry(int id);
 

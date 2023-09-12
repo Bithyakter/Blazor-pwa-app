@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Components;
 using System.Net.Http;
 using System.Net;
 using System.Net.Http.Json;
+using BlazorPwaApp.Client.Pages;
 
 namespace BlazorPwaApp.Client.Services.UserAccountService
 {
@@ -59,12 +60,25 @@ namespace BlazorPwaApp.Client.Services.UserAccountService
       }
 
       //GET ALL USER ACCOUNTS
-      public async Task GetUserAccounts()
+      //public async Task GetUserAccounts()
+      //{
+      //   var result = await _http.GetFromJsonAsync<List<UserAccount>>("api/userAccount");
+
+      //   if (result != null)
+      //      UserAccounts = result;
+      //}
+
+      public async Task<List<UserAccount>> GetUserAccounts()
       {
          var result = await _http.GetFromJsonAsync<List<UserAccount>>("api/userAccount");
 
          if (result != null)
+         {
             UserAccounts = result;
+            return result;
+         }
+
+         return new List<UserAccount>();
       }
 
       //SET USER ACCOUNT
@@ -80,6 +94,7 @@ namespace BlazorPwaApp.Client.Services.UserAccountService
          public UserAccountNotFoundException() : base("UserAccount not found!") { }
       }
 
+      //USER LOGIN
       public async Task<UserAccount> UserLogin(LoginDto login)
       {
          try

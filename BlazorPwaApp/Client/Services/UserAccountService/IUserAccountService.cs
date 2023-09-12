@@ -6,8 +6,8 @@ namespace BlazorPwaApp.Client.Services.UserAccountService
    public interface IUserAccountService
    {
       List<UserAccount> UserAccounts { get; set; }
-
-      Task GetUserAccounts();
+      
+      Task<List<UserAccount>> GetUserAccounts();
 
       Task<UserAccount> GetUserAccountByKey(int id);
 

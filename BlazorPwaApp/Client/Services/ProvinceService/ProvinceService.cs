@@ -16,7 +16,7 @@ namespace BlazorPwaApp.Client.Services.ProvinceService
       }
 
       public List<Province> Provinces { get; set; } = new List<Province>();
-      public List<Country> Countries { get; set; } = new List<Country>();
+      public List<BlazorPwaApp.Shared.Entities.Country> Countries { get; set; } = new List<BlazorPwaApp.Shared.Entities.Country>();
 
       public async Task CreateProvince(Province province)
       {
@@ -39,7 +39,7 @@ namespace BlazorPwaApp.Client.Services.ProvinceService
 
       public async Task GetCountries()
       {
-         var result = await _http.GetFromJsonAsync<List<Country>>("api/province/countries");
+         var result = await _http.GetFromJsonAsync<List<BlazorPwaApp.Shared.Entities.Country>>("api/province/countries");
 
          if (result != null)
             Countries = result;
@@ -55,12 +55,25 @@ namespace BlazorPwaApp.Client.Services.ProvinceService
          throw new Exception("Province not found!");
       }
 
-      public async Task GetProvinces()
+      //public async Task GetProvinces()
+      //{
+      //   var result = await _http.GetFromJsonAsync<List<Province>>("api/province");
+
+      //   if (result != null)
+      //      Provinces = result;
+      //}
+
+      public async Task<List<Province>> GetProvinces()
       {
          var result = await _http.GetFromJsonAsync<List<Province>>("api/province");
 
          if (result != null)
+         {
             Provinces = result;
+            return result;
+         }
+
+         return new List<Province>();
       }
 
       public async Task UpdateProvince(Province province)

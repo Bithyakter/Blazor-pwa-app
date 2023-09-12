@@ -1,4 +1,5 @@
 ﻿@page "/provinces"
+@using BlazorPwaApp.Shared.Entities;
 @layout MainLayout
 @inject IProvinceService ProvinceService
 @inject IJSRuntime js
@@ -8,39 +9,98 @@
 
 <h3>Provinces</h3>
 
-<button class="btn btn-primary" @onclick="CreateNewProvince">Create New Province</button>
+@*<button class="btn btn-primary" @onclick="CreateNewProvince">Create New Province</button>*@
 
-<table class="table">
+<div class="row">
+   <div class="col-md-8">
+      <button class="btn btn-primary" @onclick="CreateNewProvince"><i class="fas fa-user-plus"></i> Create New Province</button>
+   </div>
 
-   <thead>
-      <tr>
-         <th>Country</th>
-         <th>Province Name</th>         
-         <th></th>
-      </tr>
-   </thead>
-
-   <tbody>
-      @foreach (var province in ProvinceService.Provinces)
+   <div class="input-group col">
+      <input type="text" class="form-control" placeholder="Search province by name"
+      @bind="SearchString" @bind:event="oninput" @onkeyup="FilterProvince" />
+      @if (SearchString.Length > 0)
       {
-         <tr>
-            <td>@province.Country.CountryName</td>
-            <td>@province.ProvinceName</td>
-            <td>
-               <button class="btn btn-primary" @onclick="(() => ShowProvince(province.Oid))"><i class="oi oi-pencil"></i></button>
-               <button type="button" class="btn btn-danger mx-2" @onclick="(() => ConfirmDelete(province.Oid, province.ProvinceName))"><i class="oi oi-delete"></i></button>
-            </td>
-         </tr>
+         <div class="input-group-append">
+            <button class="btn btn-danger" @onclick="ResetSearch">
+               <i class="fas fa-times"></i>
+            </button>
+         </div>
       }
-   </tbody>
+   </div>
+</div>
 
-</table>
+@if (list != null)
+{
+   <table class="table">
+
+      <thead>
+         <tr>
+            <th>Country</th>
+            <th>Province Name</th>         
+            <th></th>
+         </tr>
+      </thead>
+
+      <tbody>
+         @foreach (var province in list)
+         {
+            <tr>
+               <td>@province?.Country?.CountryName</td>
+               <td>@province.ProvinceName</td>
+               <td>
+                  <button class="btn btn-primary" @onclick="(() => ShowProvince(province.Oid))"><i class="oi oi-pencil"></i></button>
+                  <button type="button" class="btn btn-danger mx-2" @onclick="(() => ConfirmDelete(province.Oid, province.ProvinceName))"><i class="oi oi-delete"></i></button>
+               </td>
+            </tr>
+         }
+      </tbody>
+
+   </table>
+}
 
 @code {
+   protected List<Province> list = new List<Province>();
+
+   protected List<Province> searchProvinceData = new();
+   protected string SearchString { get; set; } = string.Empty;
+
    protected override async Task OnInitializedAsync()
    {
-      await ProvinceService.GetProvinces();
+      await LoadProvinces();
    }
+
+   private async Task LoadProvinces()
+   {
+      var provinces = await ProvinceService.GetProvinces();
+      list = provinces;
+      searchProvinceData = provinces;
+   }
+
+   protected void FilterProvince()
+   {
+      if (!string.IsNullOrEmpty(SearchString))
+      {
+         list = searchProvinceData
+             .Where(x => x.ProvinceName.IndexOf(SearchString, StringComparison.OrdinalIgnoreCase) != -1)
+             .ToList();
+      }
+      else
+      {
+         list = searchProvinceData;
+      }
+   }
+
+   public void ResetSearch()
+   {
+      SearchString = string.Empty;
+      list = searchProvinceData;
+   }
+
+   //protected override async Task OnInitializedAsync()
+   //{
+   //   await ProvinceService.GetProvinces();
+   //}
 
    void ShowProvince(int id)
    {
@@ -57,7 +117,13 @@
       if (await js.InvokeAsync<bool>("confirm", $"Do you want to delete {province}'s ({id}) Record?"))
       {
          await ProvinceService.DeleteProvince(id);
-         await ProvinceService.GetProvinces();
+
+         var deletedProvince = list.FirstOrDefault(c => c.Oid == id);
+
+         if (deletedProvince != null)
+         {
+            list.Remove(deletedProvince);
+         }
       }
    }
 }

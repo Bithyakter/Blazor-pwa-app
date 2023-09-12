@@ -70,13 +70,17 @@ namespace BlazorPwaApp.Client.Services.DistrictService
          await SetDistricts(result);
       }
 
-      //GET DISTRICTS
-      public async Task GetDistricts()
+      public async Task<List<District>> GetDistricts()
       {
          var result = await _http.GetFromJsonAsync<List<District>>("api/district");
 
          if (result != null)
+         {
             Districts = result;
+            return result;
+         }
+
+         return new List<District>();
       }
 
       private async Task SetDistricts(HttpResponseMessage result)

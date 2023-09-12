@@ -18,7 +18,7 @@ namespace BlazorPwaApp.Client.Services.FacilityService
 
       Task GetDistricts();
 
-      Task GetFacilities();
+      Task<List<Facility>> GetFacilities();
 
       Task<Facility> GetSingleFacility(int id);
 

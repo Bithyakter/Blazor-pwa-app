@@ -64,14 +64,19 @@ namespace BlazorPwaApp.Client.Services.FacilityService
             return result;
 
          throw new Exception("Facility not found!");
-      }
+      }  
 
-      public async Task GetFacilities()
+      public async Task<List<Facility>> GetFacilities()
       {
          var result = await _http.GetFromJsonAsync<List<Facility>>("api/facility");
 
          if (result != null)
+         {
             Facilities = result;
+            return result;
+         }
+
+         return new List<Facility>();
       }
 
       public async Task UpdateFacility(Facility facility)

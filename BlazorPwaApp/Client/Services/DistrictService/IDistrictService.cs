@@ -10,7 +10,7 @@ namespace BlazorPwaApp.Client.Services.DistrictService
 
       List<Country> Countries { get; set; }
 
-      Task GetDistricts();
+      Task<List<District>> GetDistricts();
 
       Task GetProvinces();     
 

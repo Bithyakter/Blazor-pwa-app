@@ -1,4 +1,5 @@
 ﻿@page "/districts"
+@using BlazorPwaApp.Shared.Entities;
 @layout MainLayout
 @inject IDistrictService DistrictService
 @inject IJSRuntime js
@@ -8,41 +9,101 @@
 
 <h3>Districts</h3>
 
-<button class="btn btn-primary" @onclick="CreateNewDistrict">Create New District</button>
+@*<button class="btn btn-primary" @onclick="CreateNewDistrict">Create New District</button>*@
 
-<table class="table">
+<div class="row">
+   <div class="col-md-8">
+      <button class="btn btn-primary" @onclick="CreateNewDistrict"><i class="fas fa-user-plus"></i> Create New District</button>
+   </div>
 
-   <thead>
-      <tr>
-         <th>Country</th>
-         <th>Province</th>
-         <th>District</th>
-         <th></th>
-      </tr>
-   </thead>
-
-   <tbody>
-      @foreach (var district in DistrictService.Districts)
+   <div class="input-group col">
+      <input type="text" class="form-control" placeholder="Search district by name"
+      @bind="SearchString" @bind:event="oninput" @onkeyup="FilterDistrict" />
+      @if (SearchString.Length > 0)
       {
-         <tr>
-            <td>@(district?.Province?.Country?.CountryName ?? "N/A")</td>
-            <td>@district?.Province?.ProvinceName</td>
-            <td>@district?.DistrictName</td>
-            <td>
-               <button class="btn btn-primary" @onclick="(() => ShowDistrict(district.Oid))"><i class="oi oi-pencil"></i></button>
-               <button type="button" class="btn btn-danger mx-2" @onclick="(() => ConfirmDelete(district.Oid, district.DistrictName))"><i class="oi oi-delete"></i></button>
-            </td>
-         </tr>
+         <div class="input-group-append">
+            <button class="btn btn-danger" @onclick="ResetSearch">
+               <i class="fas fa-times"></i>
+            </button>
+         </div>
       }
-   </tbody>
+   </div>
+</div>
 
-</table>
+@if (list != null)
+{
+   <table class="table">
+
+      <thead>
+         <tr>
+            <th>Country</th>
+            <th>Province</th>
+            <th>District</th>
+            <th></th>
+         </tr>
+      </thead>
+
+      <tbody>
+         @foreach (var district in list)
+         {
+            <tr>
+               <td>@(
+                  district?.Province?.Country?.CountryName ?? "N/A"
+                  )</td>
+               <td>@district?.Province?.ProvinceName</td>
+               <td>@district?.DistrictName</td>
+               <td>
+                  <button class="btn btn-primary" @onclick="(() => ShowDistrict(district.Oid))"><i class="oi oi-pencil"></i></button>
+                  <button type="button" class="btn btn-danger mx-2" @onclick="(() => ConfirmDelete(district.Oid, district.DistrictName))"><i class="oi oi-delete"></i></button>
+               </td>
+            </tr>
+         }
+      </tbody>
+
+   </table>
+}
 
 @code {
+   protected List<District> list = new List<District>();
+   protected List<District> searchDistrictData = new();
+   protected string SearchString { get; set; } = string.Empty;
+
    protected override async Task OnInitializedAsync()
    {
-      await DistrictService.GetDistricts();
+      await LoadDistricts();
    }
+
+   private async Task LoadDistricts()
+   {
+      var districts = await DistrictService.GetDistricts();
+      list = districts;
+      searchDistrictData = districts;
+   }
+
+   protected void FilterDistrict()
+   {
+      if (!string.IsNullOrEmpty(SearchString))
+      {
+         list = searchDistrictData
+             .Where(x => x.DistrictName.IndexOf(SearchString, StringComparison.OrdinalIgnoreCase) != -1)
+             .ToList();
+      }
+      else
+      {
+         list = searchDistrictData;
+      }
+   }
+
+   public void ResetSearch()
+   {
+      SearchString = string.Empty;
+      list = searchDistrictData;
+   }
+
+   //protected override async Task OnInitializedAsync()
+   //{
+   //   await DistrictService.GetDistricts();
+   //}
 
    void ShowDistrict(int id)
    {
@@ -59,7 +120,11 @@
       if (await js.InvokeAsync<bool>("confirm", $"Do you want to delete {districtName}'s ({id}) Record?"))
       {
          await DistrictService.DeleteDistrict(id);
-         await DistrictService.GetDistricts();
+
+         var deletedDistrict = list.FirstOrDefault(c => c.Oid == id);
+
+         if (deletedDistrict != null)
+            list.Remove(deletedDistrict);
       }
    }
 }

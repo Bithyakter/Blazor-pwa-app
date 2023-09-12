@@ -10,7 +10,9 @@ namespace BlazorPwaApp.Client.Services.ProvinceService
 
       Task GetCountries();
 
-      Task GetProvinces();
+      //Task GetProvinces();
+
+      Task<List<Province>> GetProvinces();
 
       Task<Province> GetSingleProvince(int id);
 
