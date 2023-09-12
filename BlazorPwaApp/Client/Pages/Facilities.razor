@@ -19,8 +19,8 @@
          <th>District</th>
          <th>Facility</th>
          <th>HMIS Code</th>
-         <th>Latitude</th>
-         <th>Longitude</th>
+         @*<th>Latitude</th>
+         <th>Longitude</th>*@
          <th>Private Facility</th>
          <th></th>
       </tr>
@@ -35,8 +35,8 @@
             <td>@facility.District.DistrictName</td>
             <td>@facility.FacilityName</td>
             <td>@facility.HMISCode</td>
-            <td>@facility.Latitude</td>
-            <td>@facility.Longitude</td>
+            @*<td>@facility.Latitude</td>
+            <td>@facility.Longitude</td>*@
             <td>
                <span>@(facility.IsPrivateFacility ? "Yes" : "No")</span>
             </td>
@@ -65,12 +65,6 @@
    {
       NavigationManager.NavigateTo("/createfacility");
    }
-
-   //async Task DeleteFacility(int facilityId)
-   //{
-   //   await FacilityService.DeleteFacility(facilityId);
-   //   await FacilityService.GetFacilities();
-   //}
 
    async Task ConfirmDelete(int id, string facility)
    {

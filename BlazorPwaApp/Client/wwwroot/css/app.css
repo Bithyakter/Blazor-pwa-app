@@ -215,3 +215,9 @@ h6 {
 .form-select {
    line-height: 2.0 !important;
 }
+
+.required:after {
+   content: " *";
+   font-weight: bold;
+   color: red;
+}

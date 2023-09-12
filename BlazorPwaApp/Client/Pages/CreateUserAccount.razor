@@ -37,7 +37,7 @@ else
                <DataAnnotationsValidator />
 
                <div class="form-group row mt-2">
-                  <label class="control-label col-md-12">First Name</label>
+                  <label class="control-label col-md-12 required">First Name</label>
                   <div class="col">
                      <InputText class="form-control" @bind-Value="userAccount.FirstName" />
                      <ValidationMessage For="@(() => userAccount.FirstName)" />
@@ -45,7 +45,7 @@ else
                </div>
 
                <div class="form-group row mt-3">
-                  <label class="control-label col-md-12">Last Name</label>
+                  <label class="control-label col-md-12 required">Last Name</label>
                   <div class="col">
                      <InputText class="form-control" @bind-Value="userAccount.Lastname" />
                      <ValidationMessage For="@(() => userAccount.Lastname)" />
@@ -53,7 +53,7 @@ else
                </div>
 
                <div class="form-group row mt-3">
-                  <label class="control-label col-md-12">Sex</label>
+                  <label class="control-label col-md-12 required">Sex</label>
                   <div class="col">
                      <InputSelect id="Sex" @bind-Value="userAccount.Sex" class="form-control">
                            @foreach (Sex sex in Enum.GetValues(typeof(Sex)))
@@ -66,7 +66,7 @@ else
                </div>
 
                <div class="form-group row mt-3">
-                  <label class="control-label col-md-12">Date of birth</label>
+                  <label class="control-label col-md-12 required">Date of birth</label>
                   <div class="col">
                      <InputDate @bind-Value="userAccount.DOB" Format="dd/mm/yyyy" Class="form-control" />
                      <ValidationMessage For="@(() => userAccount.DOB)" />
@@ -74,7 +74,7 @@ else
                </div>
 
                <div class="form-group row mt-3">
-                  <label class="control-label col-md-12">User Name</label>
+                  <label class="control-label col-md-12 required">User Name</label>
                   <div class="col">
                      <InputText class="form-control" @bind-Value="userAccount.Username" />
                      <ValidationMessage For="@(() => userAccount.Username)" />
@@ -82,7 +82,7 @@ else
                </div>
 
                <div class="form-group row mt-3">
-                  <label class="control-label col-md-12">Password</label>
+                  <label class="control-label col-md-12 required">Password</label>
                   <div class="col">
                      <InputText type="password" class="form-control" @bind-Value="userAccount.Password"></InputText>
                      <ValidationMessage For="@(() => userAccount.Password)" />
@@ -90,7 +90,7 @@ else
                </div>
 
                <div class="form-group row mt-3">
-                  <label class="control-label col-md-12">Confirm Password</label>
+                  <label class="control-label col-md-12 required">Confirm Password</label>
                   <div class="col">
                      <InputText type="password" class="form-control" @bind-Value="userAccount.ConfirmPassword"></InputText>
                      <ValidationMessage For="@(() => userAccount.ConfirmPassword)" />
@@ -100,14 +100,14 @@ else
                <div class="form-group mb-4 mt-4" align="center">
                      <button type="submit" class="btn btn-primary">@btnText</button>
 
-                     @if (Id != null)
+                    @* @if (Id != null)
                      {
                         <button type="button" class="btn btn-danger mx-2" @onclick="DeleteUserAccount">Delete UserAccount</button>
                      }
                      else
-                     {
+                     {*@
                         <button type="button" class="btn btn-danger mx-2" @onclick="GoToUserAccountPage">Back</button>
-                     }
+                     @*}*@
                </div>
             </EditForm>
 
@@ -123,7 +123,7 @@ else
    string btnText = string.Empty;
    string ErrorMessage = string.Empty;
 
-   BlazorPwaApp.Shared.Entities.UserAccount userAccount = new BlazorPwaApp.Shared.Entities.UserAccount();
+   UserAccount userAccount = new UserAccount();
 
    protected override async Task OnInitializedAsync()
    {
@@ -136,7 +136,7 @@ else
    {
       if (Id == null)
       {
-         userAccount = new BlazorPwaApp.Shared.Entities.UserAccount();
+         userAccount = new UserAccount();
       }
       else
       {

@@ -54,12 +54,6 @@
       NavigationManager.NavigateTo("/createdistrict");
    }
 
-   //async Task DeleteDistrict(int districtId)
-   //{
-   //   await DistrictService.DeleteDistrict(districtId);
-   //   await DistrictService.GetDistricts();
-   //}
-
    async Task ConfirmDelete(int id, string districtName)
    {
       if (await js.InvokeAsync<bool>("confirm", $"Do you want to delete {districtName}'s ({id}) Record?"))

@@ -37,19 +37,19 @@ else
                <DataAnnotationsValidator />
 
                <div class="mt-3">
-                  <label for="CountryName">Country Name</label>
+                  <label for="CountryName" class="required"> Country Name</label>
                   <InputText id="CountryName" @bind-Value="country.CountryName" class="form-control"></InputText>
                   <ValidationMessage For="@(() => country.CountryName)" />
                </div>
 
                <div class="mt-3">
-                  <label for="CountryCode">Country Code</label>
+                  <label for="CountryCode" class="required"> Country Code</label>
                   <InputText id="CountryCode" @bind-Value="country.CountryCode" class="form-control"></InputText>
                   <ValidationMessage For="@(() => country.CountryCode)" />
                </div>
 
                <div class="mt-3">
-                  <label for="ISOCode2">ISO Code 2</label>
+                  <label for="ISOCode2" class="required"> ISO Code 2</label>
                   <InputText id="ISOCode2" @bind-Value="country.ISOCode2" class="form-control"></InputText>
                   <ValidationMessage For="@(() => country.ISOCode2)" />
                </div>
@@ -58,14 +58,14 @@ else
 
                <button type="submit" class="btn btn-primary">@btnText</button>
 
-               @if (Id != null)
+               @*@if (Id != null)
                {
                   <button type="button" class="btn btn-danger mx-2" @onclick="DeleteCountry">Delete Country</button>
                }
                else
-               {
+               {*@
                   <button type="button" class="btn btn-danger mx-2" @onclick="GoToCountryPage">Back</button>
-               }
+               @*}*@
 
             </EditForm>
 
@@ -146,7 +146,7 @@ else
          }
          catch (Exception ex)
          {
-            ErrorMessage = "Required.";
+            ErrorMessage = "Please fill in all required fields.";
          }
       }
       else
