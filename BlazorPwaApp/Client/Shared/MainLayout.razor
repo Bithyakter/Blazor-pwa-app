@@ -1,4 +1,4 @@
-﻿@inherits LayoutComponentBase
+﻿@*@inherits LayoutComponentBase
 
 <div class="page">
     <div class="sidebar">
@@ -14,4 +14,164 @@
             @Body
         </article>
     </main>
+</div>*@
+
+@inherits LayoutComponentBase
+
+<PageTitle>Blazor App</PageTitle>
+
+<div class="page">
+   <div class="sidebar">
+      <NavMenu />
+   </div>
+
+   <main>
+      <div class="top-row px-4">
+         <nav class="header-nav ms-auto">
+            <ul class="d-flex align-items-center">
+
+               <li class="nav-item dropdown pe-3" style="">
+
+                  <a class="nav-link nav-profile d-flex align-items-center pe-0" href="javascript:void(0)" data-bs-toggle="dropdown" style="">
+                     <i class="bi bi-person-circle"></i>
+                     <span class="d-none d-md-block dropdown-toggle ps-2">Super Admin</span>
+                  </a>
+
+                  <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
+                     <li class="dropdown-header">
+
+                        <h6>Super Admin</h6>
+                        <span>Administrator</span>
+
+                     </li>
+
+                     <li>
+
+                        <a class="dropdown-item d-flex align-items-center" href="javascript:void(0)">
+                           <i class="bi bi-box-arrow-right"></i>
+                           <span>Sign Out</span>
+                        </a>
+
+                     </li>
+                  </ul>
+               </li>
+
+            </ul>
+         </nav>
+      </div>
+
+      <article class="content px-4">
+         @Body
+      </article>
+   </main>
 </div>
+<link href="css/app.css" rel="stylesheet" />
+
+<style>
+   /*.top-row[b-7h0cgpplwh]*/
+.top-row[b-lc69yfa6me] {
+   /*height: 60px;*/
+   box-shadow: rgba(1, 41, 112, 0.1) 9px 2px 20px !important;
+      background-color: rgb(255, 255, 255) !important;
+      padding-left: 20px !important;
+      transition: all 0.5s ease 0s !important;
+      padding-left: 0 !important;
+      border-bottom: none !important;
+}
+
+.nav-item[b-9d2ykqx8qf] a.active{
+      color: rgb(65, 84, 241) !important;
+      background: rgb(246, 249, 255) !important;
+}
+
+/*.top-row[b-v9qlxlo4j3]*/
+.top-row[b-9d2ykqx8qf] {
+      height: 3.5rem !important;
+      background-color: rgb(255, 255, 255) !important;
+}
+
+/*.navbar-brand[b-v9qlxlo4j3]*/
+.navbar-brand[b-9d2ykqx8qf] {
+      font-size: 1.4rem !important;
+}
+
+.navbar-dark .navbar-brand {
+      font-size: 25px !important;
+      font-weight: 700 !important;
+   /*color: rgb(1, 41, 112);*/
+}
+
+.navbar-brand {
+      padding-top: 0 !important;
+      padding-bottom: 0.3125rem !important;
+      margin-right: 1rem;
+      font-size: 1.25rem !important;
+      text-decoration: none !important;
+      white-space: nowrap !important;
+      color: rgb(1, 41, 112) !important;
+}
+
+.top-row.ps-3.navbar.navbar-dark {
+      box-shadow: rgba(1, 41, 112, 0.1) 9px 2px 20px !important;
+}
+
+.sidebar[b-lc69yfa6me] {
+      background-image: none !important;
+      box-shadow: rgba(1, 41, 112, 0.1) 0px 0px 20px !important;
+      background-color: rgb(255, 255, 255) !important;
+      transition: all 0.3s ease 0s !important;
+}
+
+.nav-item[b-9d2ykqx8qf] a:hover {
+      color: rgb(65, 84, 241) !important;
+      background: rgb(246, 249, 255) !important;
+}
+
+/*.nav-item[b-v9qlxlo4j3] a*/
+.nav-item[b-9d2ykqx8qf] a {
+      color: rgb(1, 41, 112) !important;
+      font-weight: 600 !important;
+      font-size: 15px !important;
+}
+
+.card-header, .card-footer {
+      border-color: #ebeef4 !important;
+      background-color: #fff !important;
+      padding: 15px !important;
+      color: rgb(1, 41, 112) !important;
+      font-size: 18px !important;
+}
+
+.nav-item[b-v9qlxlo4j3] a.active {
+   /*background-color: rgba(255,255,255,0.25);*/
+      color: rgb(65, 84, 241) !important;
+      background: rgb(246, 249, 255) !important;
+}
+
+.navbar-dark .navbar-brand:focus, .navbar-dark .navbar-brand:hover {
+      color: rgb(1, 41, 112) !important;
+}
+
+span.bi.bi-circle {
+      font-size: 6px !important;
+      margin-right: 8px !important;
+      line-height: 0 !important;
+      border-radius: 50% !important;
+}
+
+.sidebar-nav .nav-content .nav-link {
+   background-color: white !important;
+}
+
+.top-row[b-7h0cgpplwh] a, .top-row .btn-link[b-7h0cgpplwh] {
+      white-space: nowrap !important;
+      margin-left: 1.5rem !important;
+      color: rgb(1, 41, 112) !important;
+      font-weight: 700 !important;
+      margin-top: 15px !important;
+}
+
+.header-nav ul {
+      list-style-type: none !important;
+}
+</style>

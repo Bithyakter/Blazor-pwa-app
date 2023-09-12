@@ -25,18 +25,18 @@ else
    <p class="text-danger">@ErrorMessage</p>
 }
 
-<div class="row justify-content-center">
+<div class="row">
    <div class="col-md-10">
-      <div class="card mt-3 mb-3">
+      <div class="card">
          <div class="card-header">
-            <h2 class="fs-5">User Registration</h2>
+               <Span>User Registration</Span>
          </div>
-         <div class="card-body ps-5 pe-5">            
+         <div class="card-body ps-5 pe-5">
 
             <EditForm Model="userAccount" OnSubmit="HandleSubmit">
                <DataAnnotationsValidator />
 
-               <div class="form-group row">
+               <div class="form-group row mt-2">
                   <label class="control-label col-md-12">First Name</label>
                   <div class="col">
                      <InputText class="form-control" @bind-Value="userAccount.FirstName" />
@@ -110,6 +110,7 @@ else
                      }
                </div>
             </EditForm>
+
          </div>
       </div>
    </div>

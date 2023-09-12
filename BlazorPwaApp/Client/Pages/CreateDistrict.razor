@@ -20,71 +20,62 @@ else
    <p class="text-danger">@ErrorMessage</p>
 }
 
-<EditForm Model="district" OnSubmit="HandleSubmit">
-   <DataAnnotationsValidator />
+<div class="row">
+   <div class="col-md-10">
+      <div class="card">
+         <div class="card-header">
+            <Span>District</Span>
+         </div>
 
-   @*<div class="mt-3">
-      <label>Country</label><br />
-      <select value="district.Province.CountryId" class="form-select">
-         @foreach (var country in DistrictService.Countries)
-         {
-            <option value="@country.Oid">@country.CountryName</option>
-         }
-      </select>
+         <div class="card-body ps-5 pe-5 mb-4">
+            <EditForm Model="district" OnSubmit="HandleSubmit">
+               <DataAnnotationsValidator />
+
+               <div class="mt-3">
+                  <label>Country</label><br />
+                  <select @onchange="OnCountryChange" class="form-select">
+                     <option value="">Select a country</option>
+                     @foreach (var country in DistrictService.Countries)
+                     {
+                        <option value="@country.Oid">@country.CountryName</option>
+                     }
+                  </select>
+               </div>
+
+               <div class="mt-3">
+                  <label>Province</label><br />
+                  <select @bind="district.ProvinceId" class="form-select">
+                     <option value="">Select a province</option>
+                     @foreach (var province in DistrictService.Provinces.Where(p => p.CountryId == selectedCountryId))
+                     {
+                        <option value="@province.Oid">@province.ProvinceName</option>
+                     }
+                  </select>
+                  <ValidationMessage For="@(() => district.Province.ProvinceName)" />
+               </div>
+
+               <div class="mt-3">
+                  <label for="DistrictName">District Name</label>
+                  <InputText id="DistrictName" @bind-Value="district.DistrictName" class="form-control"></InputText>
+                  <ValidationMessage For="@(() => district.DistrictName)" />
+               </div>
+
+               <br />
+
+               <button type="submit" class="btn btn-primary">@btnText</button>
+               @if (Id != null)
+               {
+                  <button type="button" class="btn btn-danger mx-2" @onclick="DeleteDistrict">Delete District</button>
+               }
+               else
+               {
+                  <button type="button" class="btn btn-danger mx-2" @onclick="GoToDistrictPage">Back</button>
+               }
+            </EditForm>
+         </div>
+      </div>
    </div>
-
-   <div class="mt-3">
-      <label>Province</label><br />
-      <InputSelect @bind-Value="district.ProvinceId" class="form-select">
-         @foreach (var province in DistrictService.Provinces)
-         {
-            <option value="@province.Oid">@province.ProvinceName</option>
-         }
-      </InputSelect>
-      <ValidationMessage For="@(() => district.Province.ProvinceName)" />
-   </div>*@
-
-   <div class="mt-3">
-      <label>Country</label><br />
-      <select @onchange="OnCountryChange" class="form-select">
-         <option value="">Select a country</option>
-         @foreach (var country in DistrictService.Countries)
-         {
-            <option value="@country.Oid">@country.CountryName</option>
-         }
-      </select>
-   </div>
-
-   <div class="mt-3">
-      <label>Province</label><br />
-      <select @bind="district.ProvinceId" class="form-select">
-         <option value="">Select a province</option>
-         @foreach (var province in DistrictService.Provinces.Where(p => p.CountryId == selectedCountryId))
-         {
-            <option value="@province.Oid">@province.ProvinceName</option>
-         }
-      </select>
-      <ValidationMessage For="@(() => district.Province.ProvinceName)" />
-   </div>
-
-   <div class="mt-3">
-      <label for="DistrictName">District Name</label>
-      <InputText id="DistrictName" @bind-Value="district.DistrictName" class="form-control"></InputText>
-      <ValidationMessage For="@(() => district.DistrictName)" />
-   </div>
-
-   <br />
-
-   <button type="submit" class="btn btn-primary">@btnText</button>
-   @if (Id != null)
-   {
-      <button type="button" class="btn btn-danger mx-2" @onclick="DeleteDistrict">Delete District</button>
-   }
-   else
-   {
-      <button type="button" class="btn btn-danger mx-2" @onclick="GoToDistrictPage">Back</button>
-   }
-</EditForm>
+</div>
 
 @code {
    [Parameter]
