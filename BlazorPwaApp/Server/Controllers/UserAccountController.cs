@@ -31,6 +31,11 @@ namespace BlazorPwaApp.Server.Controllers
       {
          try
          {
+            //var usernameInDb = _context.UserAccounts.FirstOrDefault(u =>u.Username == userAccount.Username);
+            
+            //if (usernameInDb.Username == userAccount.Username) 
+            //   return StatusCode(StatusCodes.Status400BadRequest, MessageConstants.DuplicateUserAccountError);
+
             EncryptionHelpers encryptionHelpers = new EncryptionHelpers();
             string encryptedPassword = encryptionHelpers.Encrypt(userAccount.Password);
             userAccount.Password = encryptedPassword;
@@ -126,28 +131,6 @@ namespace BlazorPwaApp.Server.Controllers
          }
       }
 
-      //[HttpPost]
-      //public async Task<IActionResult> UserLogin(LoginDto login)
-      //{
-      //   try
-      //   {
-      //      var userInDb = await _context.UserAccounts.GetUserByUserNamePassword(login.Username, login.Password);
-
-      //      if (userInDb != null)
-      //      {
-      //         return Ok(user);
-      //      }
-      //      else
-      //      {
-      //         return StatusCode(StatusCodes.Status404NotFound, MessageConstants.NoMatchFoundError);
-      //      }
-      //   }
-      //   catch (Exception ex)
-      //   {
-      //      return StatusCode(StatusCodes.Status500InternalServerError, MessageConstants.GenericError);
-      //   }
-      //}
-
       [HttpPost("userLogin")]
       public async Task<IActionResult> UserLogin(LoginDto login)
       {
@@ -207,6 +190,43 @@ namespace BlazorPwaApp.Server.Controllers
             return StatusCode(StatusCodes.Status500InternalServerError, MessageConstants.GenericError);
          }
       }
+
+      [HttpGet("IsAccountDuplicate/{username}")]
+      public async Task<ActionResult<bool>> IsAccountDuplicate(string username)
+      {
+         try
+         {
+            var userAccountInDb = await _context.UserAccounts.SingleOrDefaultAsync(u => u.Username == username);
+
+            if (userAccountInDb != null)
+               return true;
+
+            return false;
+         }
+         catch (Exception ex)
+         {
+            return StatusCode(StatusCodes.Status500InternalServerError);
+         }
+      }
+
+      //private async Task<bool> IsAccountDuplicate(UserAccount userAccount)
+      //{
+      //   try
+      //   {
+      //      var userAccountInDb = await _context.UserAccounts.SingleOrDefaultAsync(u =>u.Username == userAccount.Username);
+
+      //      if (userAccountInDb != null)
+      //         if (userAccountInDb.Oid != userAccount.Oid)
+
+      //            return true;
+
+      //      return false;
+      //   }
+      //   catch
+      //   {
+      //      throw;
+      //   }
+      //}
 
       //[HttpPost("login")]
       //public async Task<IActionResult> Login(LoginDto login)
@@ -275,39 +295,6 @@ namespace BlazorPwaApp.Server.Controllers
       //   );
 
       //   return new JwtSecurityTokenHandler().WriteToken(token);
-      //}
-
-      //[HttpPost]
-      //public async Task<ActionResult<UserAccount>> CreateUserAccount(UserAccount userAccount)
-      //{
-      //   try
-      //   {
-      //      EncryptionHelpers encryptionHelpers = new EncryptionHelpers();
-      //      string encryptedPassword = encryptionHelpers.Encrypt(userAccount.Password);
-      //      userAccount.Password = encryptedPassword;
-
-      //      _context.UserAccounts.Add(userAccount);
-      //      await _context.SaveChangesAsync();
-
-      //      return Ok(userAccount);
-      //   }
-      //   catch (Exception ex)
-      //   {
-      //      return StatusCode(StatusCodes.Status500InternalServerError, MessageConstants.GenericError);
-      //   }
-      //}
-
-      //[HttpPost("login")]
-      //public async Task<IActionResult> Login([FromBody] LoginDto model)
-      //{
-      //   var result = await _context.UserAccounts.FindAsync(model.Username, model.Password, false);
-
-      //   if (result != null)
-      //   {
-      //      return Ok(new { Message = "Login successful" });
-      //   }
-
-      //   return BadRequest(new { Message = "Login failed" });
       //}
    }
 }
