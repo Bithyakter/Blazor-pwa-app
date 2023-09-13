@@ -11,11 +11,9 @@
 
 <h3>Countries</h3>
 
-@*<button class="btn btn-primary" @onclick="CreateNewCountry"><i class="fas fa-user-plus"></i> Create New Country</button>*@
-
 <div class="row">
    <div class="col-md-8">
-      <button class="btn btn-primary" @onclick="CreateNewCountry"><i class="fas fa-user-plus"></i> Create New Country</button>
+      <button class="btn btn-primary" @onclick="CreateNewCountry">Create New Country</button>
    </div>
 
    <div class="input-group col">
@@ -24,8 +22,8 @@
       @if (SearchString.Length > 0)
       {
          <div class="input-group-append">
-            <button class="btn btn-danger" @onclick="ResetSearch">
-               <i class="fas fa-times"></i>
+            <button class="btn btn-danger" @onclick="ResetSearch" style="font-size: 12px; margin-top: 5px; margin-left: 5px;">
+               <i class="oi oi-reload"></i>
             </button>
          </div>
       }
@@ -52,8 +50,7 @@
                <td>@country.CountryCode</td>
                <td>@country.ISOCode2</td>
                <td>
-                  <button class="btn btn-primary" @onclick="(() => ShowCountry(country.Oid))"><i class="oi oi-pencil"></i></button>
-                  @*<button type="button" class="btn btn-danger mx-2" @onclick="(() => DeleteCountry(country.Oid))"><i class="oi oi-delete"></i></button>*@
+                  <button class="btn btn-primary" @onclick="(() => ShowCountry(country.Oid))"><i class="oi oi-pencil"></i></button>                  
                   <button type="button" class="btn btn-danger mx-2" @onclick="(() => ConfirmDelete(country.Oid, country.CountryName))"><i class="oi oi-delete"></i></button>
                </td>
             </tr>
@@ -123,25 +120,28 @@
             list.Remove(deletedCountry);
          }
       }
+   }  
+}
+
+@*<button class="btn btn-primary" @onclick="CreateNewCountry"><i class="fas fa-user-plus"></i> Create New Country</button>*@
+@*<button type="button" class="btn btn-danger mx-2" @onclick="(() => DeleteCountry(country.Oid))"><i class="oi oi-delete"></i></button>*@
+
+   @*async Task ConfirmDelete(int id, string countryName)
+   {
+      if (await js.InvokeAsync<bool>("confirm", $"Do you want to delete {countryName}'s ({id}) Record?"))
+      {
+        await CountryService.DeleteCountry(id);
+        await CountryService.GetCountries();
+      }
    }
 
-   //async Task ConfirmDelete(int id, string countryName)
-   //{
-   //   if (await js.InvokeAsync<bool>("confirm", $"Do you want to delete {countryName}'s ({id}) Record?"))
-   //   {
-   //      await CountryService.DeleteCountry(id);
-   //      await CountryService.GetCountries();
-   //   }
-   //}
-
-   //protected override async Task OnInitializedAsync()
-   //{
-   //   await CountryService.GetCountries();
-   //}
+   protected override async Task OnInitializedAsync()
+   {
+      await CountryService.GetCountries();
+   }*@
 
    @* async Task DeleteCountry(int countryId)
    {
       await CountryService.DeleteCountry(countryId);
       await CountryService.GetCountries();
    }*@
-}
