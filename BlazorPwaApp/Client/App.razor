@@ -1,6 +1,10 @@
-﻿<Router AppAssembly="@typeof(App).Assembly">
+﻿@using Microsoft.AspNetCore.Authorization;
+@attribute [Authorize]
+
+<Router AppAssembly="@typeof(App).Assembly">
     <Found Context="routeData">
       <RouteView RouteData="@routeData" DefaultLayout="@typeof(CustomLayout)" />
+      @*<AuthorizeRouteView  RouteData="@routeData" DefaultLayout="@typeof(CustomLayout)" />*@
         <FocusOnNavigate RouteData="@routeData" Selector="h1" />
     </Found>
     <NotFound>

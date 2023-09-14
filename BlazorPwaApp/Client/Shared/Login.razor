@@ -109,21 +109,6 @@
 @code {
       private LoginDto login = new LoginDto();
 
-      //private async Task HandleLogin()
-      //{
-      //   var isSuccess = await UserAccountService.UserLogin(login);
-         
-      //   if (isSuccess != null)
-      //   {
-      //      await JsRuntime.InvokeVoidAsync("alert", "Login Successfully!");
-      //      NavigationManager.NavigateTo("countries");
-      //   }
-      //   else
-      //   {
-      //      Console.WriteLine("Authentication failed");
-      //   }
-      //}
-
    private async Task HandleLogin()
    {
       var isSuccess = await UserAccountService.UserLogin(login);

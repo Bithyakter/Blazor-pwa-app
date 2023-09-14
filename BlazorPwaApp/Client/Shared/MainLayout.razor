@@ -30,8 +30,6 @@
       <NavMenu />
    </div>
 
-   @*<button @onclick="HandleLogout">Sign Out</button>*@
-
    <main>
       <div class="top-row px-4">
          <nav class="header-nav ms-auto">
@@ -41,12 +39,12 @@
 
                   <a id="userDropdown" class="nav-link nav-profile d-flex align-items-center pe-0" href="javascript:void(0)" data-toggle="dropdown" @onclick="ToggleDropdown">
                      <i class="oi oi-person"></i>
-                     <span class="d-none d-md-block dropdown-toggle ps-2 pt-2">@user?.Firstname @user?.Lastname</span>
+                     <span class="d-none d-md-block dropdown-toggle ps-2 pt-2">@user?.FirstName  @user?.Lastname</span>
                   </a>
 
                   <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile" style="display: @(showDropdown ? "block" : "none")">
                      <li class="dropdown-header">
-                        <h6>@user?.Firstname @user?.Lastname</h6>
+                        <h6>@user?.FirstName @user?.Lastname</h6>
                         <span>Administrator</span>
                      </li>
 
@@ -219,7 +217,7 @@ span.bi.bi-circle {
    }
    .dropdown-menu .dropdown-header, .dropdown-menu .dropdown-footer {
       text-align: center;
-      font-size: 15px;
+      font-size: 14px;
       padding: 10px 25px;
    }
 
@@ -273,6 +271,7 @@ span.bi.bi-circle {
       min-width: 156px !important;
       padding-bottom: 8px;
       top: 45px !important;
+      margin-left: 28px;
    }
 
 </style>

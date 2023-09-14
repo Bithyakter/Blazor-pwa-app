@@ -1,8 +1,10 @@
 ﻿@page "/countries"
+@attribute [Authorize]
 @layout MainLayout
 @using BlazorPwaApp.Client.Services.CountryService;
 @using static System.Net.WebRequestMethods;
 @using BlazorPwaApp.Shared.Entities;
+@using Microsoft.AspNetCore.Authorization;
 @inject ICountryService CountryService
 @inject IJSRuntime js
 @inject NavigationManager NavigationManager

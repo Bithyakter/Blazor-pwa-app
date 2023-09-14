@@ -29,7 +29,6 @@ builder.Services.AddScoped<IProvinceService, ProvinceService>();
 builder.Services.AddScoped<IDistrictService, DistrictService>();
 builder.Services.AddScoped<IFacilityService, FacilityService>();
 builder.Services.AddScoped<IUserAccountService, UserAccountService>();
-//builder.Services.AddScoped<ISessionService, SessionService>();
 builder.Services.AddScoped<ISessionService, LocalStorageSessionService>();
 
 //builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://staging-sc.api.arcapps.org/sc-api/") });

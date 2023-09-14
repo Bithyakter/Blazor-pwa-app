@@ -4,9 +4,33 @@ using BlazorPwaApp.Server;
 using BlazorPwaApp.Server.AppDbContext;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Components.Web;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.AspNetCore.Components.Server;
 
 var builder = WebApplication.CreateBuilder(args);
 
+//builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+//    .AddCookie(options =>
+//    {
+//       options.LoginPath = "/login"; // Set the login page URL
+//       options.AccessDeniedPath = "/accessdenied"; // Set the access denied page URL
+//    });
+
+//builder.Services.AddAuthorization(options =>
+//{
+//   options.AddPolicy("RequireAuthenticatedUser", policy =>
+//   {
+//      policy.RequireAuthenticatedUser();
+//   });
+//});
+
+// USE SESSION
 builder.Services.AddDistributedMemoryCache(); 
 builder.Services.AddSession(options =>
 {
@@ -21,21 +45,6 @@ builder.Services.AddRazorPages();
 builder.Services.AddDbContext<DataContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddMvc();
-//builder.Services.AddHttpContextAccessor();
-//builder.Services.AddDistributedMemoryCache();
-//builder.Services.AddAuthentication("Cookies")
-//    .AddCookie("Cookies", config =>
-//    {
-//       config.Cookie.Name = "__BlazorInfo__";
-//       config.LoginPath = "/";
-//       config.SlidingExpiration = true;
-//    });
-
-//builder.Services.AddSession();
-//builder.Services.AddSession(options =>
-//{
-//   options.IdleTimeout = TimeSpan.FromMinutes(30); // Session timeout duration
-//});
 
 var app = builder.Build();
 
