@@ -1,11 +1,15 @@
 ﻿@page "/login"
 @layout CustomLayout
+@using BlazorPwaApp.Client.Services;
 @using BlazorPwaApp.Shared.Entities
 @using BlazorPwaApp.Shared.Dto
 @inject IUserAccountService UserAccountService
 @inject IJSRuntime JsRuntime
 @inject NavigationManager NavigationManager
 @using System.ComponentModel.DataAnnotations
+@using System.Security.Claims;
+@using Microsoft.AspNetCore.Authentication.Cookies;
+@inject ISessionService SessionService
 
 <PageTitle>Login</PageTitle>
 
@@ -17,14 +21,15 @@
          <span class="card-title d-lg-block fs-2 fw-bolder">Smart Care Plus - Admin</span>
       </a>
       <!--/BRAND LOGO-->
+
       <!-- LEFT IMAGE-->
       <div class="d-none d-lg-flex col-lg-8 align-items-center pe-5 ps-5 pb-5 pt-5 img-size">
          <div class="w-100 d-lg-flex align-items-center justify-content-center">
-            @*<img class="img-fluid" src="/assets/img/admin-login1.png" />*@
             <img class="img-fluid img-responsive" width="80%" src="/images/admin-login1.png">
          </div>
       </div>
       <!-- /LEFT IMAGE-->
+
       <!--LOGIN-->
       <div class="d-flex col-lg-4 align-items-center auth-bg px-2 p-lg-2">
          <div class="col-10 col-sm-8 col-md-6 col-lg-10 px-xl-2 mx-auto">
@@ -40,36 +45,6 @@
                      <h4 class="card-title text-center pb-0 fw-bolder fs-sm-5 ">Login to Smart Care Admin</h4>
                      <p class="text-center small">Enter your <strong>Username</strong>  & <strong>Password</strong> to Login.</p>
                   </div>
-
-                  @*<form class="row g-3" Model="@login" OnValidSubmit="HandleLogin">
-
-                     <!--USERNAME-->
-                     <div class="col-12 form-floating">
-
-                        <div class="form-floating mt-2">
-                           <input asp-for="Username" type="text" class="form-control" data-val="true" data-val-required="Required." data-val-length-max="60" data-val-length-min="2" data-val-length="Username should be atleast 2 characters." placeholder="First name" onkeypress="return IsAlphabat(event,this);">
-                           <label asp-for="Username" class="">Username</label>
-                           <span asp-validation-for="Username" class="text-danger"></span>
-                        </div>
-                     </div>
-
-                     <!--PASSWORD-->
-                     <div class="col-12 form-floating">
-                        <div class="col-12 form-floating mb-2">
-                           <div class="input-group">
-                              <input asp-for="Password" type="password" class="form-control required p-3" placeholder="Password">
-                              <span class="input-group-text" id="eye"><i class="bi bi-eye"></i></span>
-                           </div>
-                           <span asp-validation-for="Password" class="text-danger"></span>
-                        </div>
-                     </div>
-
-                     <!--ACTION-->
-                     <div class="col-12 mb-2 mt-2">
-                        <button class="btn btn-primary w-100 p-2" type="submit">Login</button>
-                     </div>
-
-                  </form>*@
 
                   <EditForm class="row g-3" Model="@login" OnValidSubmit="HandleLogin">
                      <DataAnnotationsValidator />
@@ -94,17 +69,6 @@
                            <ValidationMessage For="@(() => login.Password)" />
                         </div>
                      </div>
-
-                     <!--PASSWORD-->
-                     @*<div class="col-12 form-floating">
-                        <div class="col-12 form-floating mb-2">
-                           <div class="input-group">
-                              <InputText id="ConfirmPassword" type="ConfirmPassword" class="form-control required p-3" @bind-Value="@login.ConfirmPassword" />
-                              <span class="input-group-text" id="eye"><i class="bi bi-eye"></i></span>
-                           </div>
-                           <ValidationMessage For="@(() => login.ConfirmPassword)" />
-                        </div>
-                     </div>*@
 
                      <!--ACTION-->
                      <div class="col-12 mb-2 mt-2">
@@ -145,18 +109,55 @@
 @code {
       private LoginDto login = new LoginDto();
 
-      private async Task HandleLogin()
-      {
-         var isSuccess = await UserAccountService.UserLogin(login);
+      //private async Task HandleLogin()
+      //{
+      //   var isSuccess = await UserAccountService.UserLogin(login);
          
-         if (isSuccess != null)
-         {
-            await JsRuntime.InvokeVoidAsync("alert", "Login Successfully!");
-            NavigationManager.NavigateTo("countries");
-         }
-         else
-         {
-            Console.WriteLine("Authentication failed");
-         }
-      }
+      //   if (isSuccess != null)
+      //   {
+      //      await JsRuntime.InvokeVoidAsync("alert", "Login Successfully!");
+      //      NavigationManager.NavigateTo("countries");
+      //   }
+      //   else
+      //   {
+      //      Console.WriteLine("Authentication failed");
+      //   }
+      //}
+
+   private async Task HandleLogin()
+   {
+      var isSuccess = await UserAccountService.UserLogin(login);
+
+       if (isSuccess != null)
+       {
+         await SessionService.SetItemAsync("user", isSuccess);
+         await JsRuntime.InvokeVoidAsync("alert", "Login Successfully!");
+         NavigationManager.NavigateTo("countries");
+       }
+       else
+       {
+        Console.WriteLine("Authentication failed");
+       }
+   }
 }
+
+   @*   private async Task HandleLogin()
+   {
+      var isSuccess = await UserAccountService.UserLogin(login);
+
+      if (isSuccess != null)
+      {
+         // Create a ClaimsPrincipal with user information
+         var claimsIdentity = new ClaimsIdentity(new[] { new Claim(ClaimTypes.Name, login.Username) }, CookieAuthenticationDefaults.AuthenticationScheme);
+
+         // Sign in the user
+         await SessionService.SetItemAsync(new ClaimsPrincipal(claimsIdentity));
+
+         await JsRuntime.InvokeVoidAsync("alert", "Login Successfully!");
+         NavigationManager.NavigateTo("countries");
+      }
+      else
+      {
+         Console.WriteLine("Authentication failed");
+      }
+   }*@

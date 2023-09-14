@@ -1,8 +1,17 @@
+using BlazorPwaApp.Client.Services;
+using BlazorPwaApp.Client.Services.UserAccountService;
+using BlazorPwaApp.Server;
 using BlazorPwaApp.Server.AppDbContext;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddDistributedMemoryCache(); 
+builder.Services.AddSession(options =>
+{
+   options.IdleTimeout = TimeSpan.FromMinutes(30); // Session timeout duration
+});
 
 // Add services to the container.
 
@@ -11,36 +20,24 @@ builder.Services.AddRazorPages();
 
 builder.Services.AddDbContext<DataContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-var app = builder.Build();
-
-//builder.Services.AddMvc();
+builder.Services.AddMvc();
 //builder.Services.AddHttpContextAccessor();
 //builder.Services.AddDistributedMemoryCache();
 //builder.Services.AddAuthentication("Cookies")
 //    .AddCookie("Cookies", config =>
 //    {
-//       config.Cookie.Name = "__SCinfo__";
+//       config.Cookie.Name = "__BlazorInfo__";
 //       config.LoginPath = "/";
 //       config.SlidingExpiration = true;
 //    });
 
 //builder.Services.AddSession();
-//builder.Services.AddSession(options => { options.IdleTimeout = TimeSpan.FromMinutes(240); });
+//builder.Services.AddSession(options =>
+//{
+//   options.IdleTimeout = TimeSpan.FromMinutes(30); // Session timeout duration
+//});
 
-//builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-//        .AddJwtBearer(options =>
-//        {
-//           options.TokenValidationParameters = new TokenValidationParameters
-//           {
-//              ValidateIssuer = true,
-//              ValidateAudience = true,
-//              ValidateLifetime = true,
-//              ValidateIssuerSigningKey = true,
-//              ValidIssuer = Configuration["JwtIssuer"],
-//              ValidAudience = Configuration["JwtIssuer"],
-//              IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["JwtKey"]))
-//           };
-//        });
+var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -60,6 +57,10 @@ app.UseBlazorFrameworkFiles();
 app.UseStaticFiles();
 
 app.UseRouting();
+
+app.UseAuthentication();
+app.UseAuthorization();
+app.UseSession();
 
 app.MapRazorPages();
 app.MapControllers();

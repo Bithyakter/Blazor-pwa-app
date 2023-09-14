@@ -16,13 +16,21 @@
     </main>
 </div>*@
 
+@using BlazorPwaApp.Client.Services;
+@using BlazorPwaApp.Shared.Dto;
+
 @inherits LayoutComponentBase
+@inject ISessionService SessionService
+@inject NavigationManager NavigationManager
+
 <PageTitle>Blazor App</PageTitle>
 
 <div class="page">
    <div class="sidebar">
       <NavMenu />
    </div>
+
+   @*<button @onclick="HandleLogout">Sign Out</button>*@
 
    <main>
       <div class="top-row px-4">
@@ -31,26 +39,22 @@
 
                <li class="nav-item dropdown pe-3" style="">
 
-                  <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown" style="">
-                     <i class="bi bi-person-circle"></i>
-                     <span class="d-none d-md-block dropdown-toggle ps-2 pt-3">Sign out</span>
+                  <a id="userDropdown" class="nav-link nav-profile d-flex align-items-center pe-0" href="javascript:void(0)" data-toggle="dropdown" @onclick="ToggleDropdown">
+                     <i class="oi oi-person"></i>
+                     <span class="d-none d-md-block dropdown-toggle ps-2 pt-2">@user?.Firstname @user?.Lastname</span>
                   </a>
 
-                  <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
+                  <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile" style="display: @(showDropdown ? "block" : "none")">
                      <li class="dropdown-header">
-
-                        <h6>Super Admin</h6>
+                        <h6>@user?.Firstname @user?.Lastname</h6>
                         <span>Administrator</span>
-
                      </li>
 
                      <li>
-
-                        <a class="dropdown-item d-flex align-items-center" href="javascript:void(0)">
-                           <i class="bi bi-box-arrow-right"></i>
-                           <span>Sign Out</span>
+                        <a class="dropdown-item d-flex align-items-center" href="javascript:void(0)" @onclick="HandleLogout">
+                           <i class="oi oi-arrow-right"></i>
+                           <span> Sign Out</span>
                         </a>
-
                      </li>
                   </ul>
                </li>
@@ -64,7 +68,37 @@
       </article>
    </main>
 </div>
+
 <link href="css/app.css" rel="stylesheet" />
+
+@*@code {
+   private async Task HandleSignOut()
+   {
+      await SessionService.SignOutAsync();
+      NavigationManager.NavigateTo("/login");
+   }
+}*@
+
+@code {
+   private UserClaimsDto user;
+   private bool showDropdown = false;
+
+   protected override async Task OnInitializedAsync()
+   {
+      user = await SessionService.GetItemAsync<UserClaimsDto>("user");
+   }
+
+   private async Task HandleLogout()
+   {
+      await SessionService.RemoveItemAsync("user");
+      NavigationManager.NavigateTo("/login");
+   }
+
+   private void ToggleDropdown()
+   {
+      showDropdown = !showDropdown;
+   }
+}
 
 <style>
    /*.top-row[b-7h0cgpplwh]*/
@@ -173,4 +207,72 @@ span.bi.bi-circle {
 .header-nav ul {
       list-style-type: none !important;
 }
+
+.header-nav .nav-profile {
+   color: #012970;
+}
+
+   .header-nav .profile {
+      min-width: 240px;
+      padding-bottom: 0;
+      top: 8px !important;
+   }
+   .dropdown-menu .dropdown-header, .dropdown-menu .dropdown-footer {
+      text-align: center;
+      font-size: 15px;
+      padding: 10px 25px;
+   }
+
+   .dropdown-header {
+      display: block;
+      padding: var(--bs-dropdown-header-padding-y) var(--bs-dropdown-header-padding-x);
+      margin-bottom: 0;
+      font-size: .875rem;
+      color: var(--bs-dropdown-header-color);
+      white-space: nowrap;
+   }
+
+   .header-nav ul {
+      list-style: none;
+   }
+
+   .dropdown-menu {
+      border-radius: 4px;
+      padding: 10px 0;
+      -webkit-animation-name: dropdown-animate;
+      animation-name: dropdown-animate;
+      -webkit-animation-duration: 0.2s;
+      animation-duration: 0.2s;
+      -webkit-animation-fill-mode: both;
+      animation-fill-mode: both;
+      border: 0;
+      box-shadow: 0 5px 30px 0 rgba(82, 63, 105, 0.2);
+   }
+
+   .nav-item a {
+      text-decoration: none;
+   }
+
+   ul.dropdown-menu.dropdown-menu-end.dropdown-menu-arrow.profile.show {
+      position: absolute;
+      inset: 0px 0px auto auto;
+      margin: 0px;
+      transform: translate3d(-16px, 26px, 0px);
+   }
+
+   .header-nav .nav-profile span {
+      font-size: 14px;
+      font-weight: 600;
+   }
+
+   .dropdown, .dropdown-center, .dropend, .dropstart, .dropup, .dropup-center {
+      position: relative;
+   }
+
+   .header-nav .profile {
+      min-width: 156px !important;
+      padding-bottom: 8px;
+      top: 45px !important;
+   }
+
 </style>
