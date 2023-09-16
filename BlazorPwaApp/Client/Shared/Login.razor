@@ -28,12 +28,17 @@
             <img class="img-fluid img-responsive" width="80%" src="/images/admin-login1.png">
          </div>
       </div>
-      <!-- /LEFT IMAGE-->
+      <!-- /LEFT IMAGE-->     
 
       <!--LOGIN-->
       <div class="d-flex col-lg-4 align-items-center auth-bg px-2 p-lg-2">
          <div class="col-10 col-sm-8 col-md-6 col-lg-10 px-xl-2 mx-auto">
             <!--CARD-->
+            @if (!string.IsNullOrEmpty(ErrorMessage))
+            {
+               <p class="text-danger ps-5 ms-5">@ErrorMessage</p>
+            }
+
             <div class="card shadow-2-strong mb-2" style="border-radius: 1rem;">
                <div class="card-body">
 
@@ -107,23 +112,48 @@
 </div>
 
 @code {
-      private LoginDto login = new LoginDto();
+   string ErrorMessage = string.Empty;
+   private LoginDto login = new LoginDto();
 
    private async Task HandleLogin()
    {
-      var isSuccess = await UserAccountService.UserLogin(login);
+      try
+      {
+         var isSuccess = await UserAccountService.UserLogin(login);
 
-       if (isSuccess != null)
-       {
-         await SessionService.SetItemAsync("user", isSuccess);
-         await JsRuntime.InvokeVoidAsync("alert", "Login Successfully!");
-         NavigationManager.NavigateTo("countries");
-       }
-       else
-       {
-        Console.WriteLine("Authentication failed");
-       }
+         if (isSuccess != null)
+         {
+            await SessionService.SetItemAsync("user", isSuccess);
+            await JsRuntime.InvokeVoidAsync("alert", "Login Successfully!");
+            NavigationManager.NavigateTo("countries");
+         }
+         else
+         {
+            ErrorMessage = "Authentication failed. Password does not match.";
+         }
+      }
+      catch (ApiException ex)
+      {
+         ErrorMessage = ex.Message;
+      }
    }
+
+   //private async Task HandleLogin()
+   //{
+   //   var isSuccess = await UserAccountService.UserLogin(login);
+
+   //    if (isSuccess != null)
+   //    {
+   //      await SessionService.SetItemAsync("user", isSuccess);
+   //      await JsRuntime.InvokeVoidAsync("alert", "Login Successfully!");
+   //      NavigationManager.NavigateTo("countries");
+   //    }
+   //    else
+   //    {
+   //      await JsRuntime.InvokeVoidAsync("alert", "Authentication failed. Password does not match.");
+   //    }
+   //}
+   
 }
 
    @*   private async Task HandleLogin()

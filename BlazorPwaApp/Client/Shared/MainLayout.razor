@@ -1,27 +1,9 @@
-﻿@*@inherits LayoutComponentBase
-
-<div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
-
-    <main>
-        <div class="top-row px-4">
-            <a href="https://docs.microsoft.com/aspnet/" target="_blank">PWA</a>
-        </div>
-
-        <article class="content px-4">
-            @Body
-        </article>
-    </main>
-</div>*@
-
-@using BlazorPwaApp.Client.Services;
-@using BlazorPwaApp.Shared.Dto;
-
+﻿
 @inherits LayoutComponentBase
 @inject ISessionService SessionService
 @inject NavigationManager NavigationManager
+@using BlazorPwaApp.Client.Services;
+@using BlazorPwaApp.Shared.Dto;
 
 <PageTitle>Blazor App</PageTitle>
 
@@ -47,6 +29,18 @@
                         <h6>@user?.FirstName @user?.Lastname</h6>
                         <span>Administrator</span>
                      </li>
+                     <li>
+                           <hr class="dropdown-divider">
+                     </li>
+                     <li>
+                        <a class="dropdown-item d-flex align-items-center ps-0" href="javascript:void(0)" @onclick="NavigateToChangePassword">
+                           <i class="bi bi-question-circle"></i>
+                           <span>Change Password</span>
+                        </a>
+                     </li>
+                     <li>
+                           <hr class="dropdown-divider">
+                     </li>
 
                      <li>
                         <a class="dropdown-item d-flex align-items-center" href="javascript:void(0)" @onclick="HandleLogout">
@@ -69,14 +63,6 @@
 
 <link href="css/app.css" rel="stylesheet" />
 
-@*@code {
-   private async Task HandleSignOut()
-   {
-      await SessionService.SignOutAsync();
-      NavigationManager.NavigateTo("/login");
-   }
-}*@
-
 @code {
    private UserClaimsDto user;
    private bool showDropdown = false;
@@ -96,10 +82,14 @@
    {
       showDropdown = !showDropdown;
    }
+
+   private async Task NavigateToChangePassword()
+   {
+      NavigationManager.NavigateTo("/changepassword");
+   }
 }
 
 <style>
-   /*.top-row[b-7h0cgpplwh]*/
 .top-row[b-lc69yfa6me] {
    /*height: 60px;*/
    box-shadow: rgba(1, 41, 112, 0.1) 9px 2px 20px !important;
@@ -115,13 +105,11 @@
       background: rgb(246, 249, 255) !important;
 }
 
-/*.top-row[b-v9qlxlo4j3]*/
 .top-row[b-9d2ykqx8qf] {
       height: 3.5rem !important;
       background-color: rgb(255, 255, 255) !important;
 }
 
-/*.navbar-brand[b-v9qlxlo4j3]*/
 .navbar-brand[b-9d2ykqx8qf] {
       font-size: 1.4rem !important;
 }
@@ -158,7 +146,6 @@
       background: rgb(246, 249, 255) !important;
 }
 
-/*.nav-item[b-v9qlxlo4j3] a*/
 .nav-item[b-9d2ykqx8qf] a {
       color: rgb(1, 41, 112) !important;
       font-weight: 600 !important;

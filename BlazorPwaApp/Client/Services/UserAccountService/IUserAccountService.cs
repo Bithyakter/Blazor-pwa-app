@@ -18,5 +18,7 @@ namespace BlazorPwaApp.Client.Services.UserAccountService
       Task DeleteUserAccount(int id);
 
       Task<UserAccount> UserLogin(LoginDto login);
+
+      Task ChangePassword(ChangedPasswordDto changedPassword);
    }
 }

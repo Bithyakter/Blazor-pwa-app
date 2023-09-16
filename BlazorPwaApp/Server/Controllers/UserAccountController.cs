@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -162,34 +163,60 @@ namespace BlazorPwaApp.Server.Controllers
       {
          try
          {
-            var userInDb = await _context.UserAccounts.SingleOrDefaultAsync(p =>p.Username == changePassword.Username && p.Password == changePassword.Password);
+            user = await _context.UserAccounts.SingleOrDefaultAsync(u => u.Username.ToLower().Trim() == changePassword.Username.ToLower().Trim());
 
-            if (userInDb.Password == changePassword.Password)
-            {
-               if (userInDb != null)
-               {
-                  userInDb.Password = changePassword.ConfirmPassword;
+            EncryptionHelpers encryptionHelpers = new EncryptionHelpers();
+            string encryptedOldPassword = encryptionHelpers.Encrypt(changePassword.Password);
 
-                  _context.UserAccounts.Update(userInDb);
-                  await _context.SaveChangesAsync();
+            if (user.Password != encryptedOldPassword)
+               return BadRequest(MessageConstants.OldPasswordMatchError);
 
-                  return Ok();
-               }
-               else
-               {
-                  return StatusCode(StatusCodes.Status404NotFound, MessageConstants.NoMatchFoundError);
-               }
-            }
-            else
-            {
-               return StatusCode(StatusCodes.Status404NotFound, MessageConstants.NoMatchFoundError);
-            }
+            string encryptedPassword = encryptionHelpers.Encrypt(changePassword.NewPassword);
+            user.Password = encryptedPassword;
+
+            _context.UserAccounts.Update(user);
+            await _context.SaveChangesAsync();
+
+            return Ok(user);
          }
          catch (Exception ex)
          {
             return StatusCode(StatusCodes.Status500InternalServerError, MessageConstants.GenericError);
          }
       }
+
+      //public async Task<IActionResult> ChangedPassword(ChangedPasswordDto changePassword)
+      //{
+      //   try
+      //   {
+      //      var userInDb = await _context.UserAccounts.SingleOrDefaultAsync(p =>p.Username == changePassword.Username && p.Password == changePassword.Password);
+
+      //      if (userInDb.Password == changePassword.Password)
+      //      {
+      //         if (userInDb != null)
+      //         {
+      //            userInDb.Password = changePassword.ConfirmPassword;
+
+      //            _context.UserAccounts.Update(userInDb);
+      //            await _context.SaveChangesAsync();
+
+      //            return Ok();
+      //         }
+      //         else
+      //         {
+      //            return StatusCode(StatusCodes.Status404NotFound, MessageConstants.NoMatchFoundError);
+      //         }
+      //      }
+      //      else
+      //      {
+      //         return StatusCode(StatusCodes.Status404NotFound, MessageConstants.NoMatchFoundError);
+      //      }
+      //   }
+      //   catch (Exception ex)
+      //   {
+      //      return StatusCode(StatusCodes.Status500InternalServerError, MessageConstants.GenericError);
+      //   }
+      //}
 
       [HttpGet("IsAccountDuplicate/{username}")]
       public async Task<ActionResult<bool>> IsAccountDuplicate(string username)

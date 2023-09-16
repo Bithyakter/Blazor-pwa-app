@@ -6,6 +6,8 @@ using System.Net.Http;
 using System.Net;
 using System.Net.Http.Json;
 using BlazorPwaApp.Client.Pages;
+using static System.Net.WebRequestMethods;
+using Microsoft.JSInterop;
 
 namespace BlazorPwaApp.Client.Services.UserAccountService
 {
@@ -105,13 +107,40 @@ namespace BlazorPwaApp.Client.Services.UserAccountService
             {
                return await response.Content.ReadFromJsonAsync<UserAccount>();
             }
-            else if (response.StatusCode == HttpStatusCode.NotFound)
+            //else if (response.StatusCode == HttpStatusCode.NotFound)
+            //{
+            //   throw new ApiException(MessageConstants.NoMatchFoundError);
+            //}
+            else
             {
                throw new ApiException(MessageConstants.NoMatchFoundError);
             }
+         }
+         catch (HttpRequestException ex)
+         {
+            // Handle any network-related errors
+            throw new ApiException("Network Error: Unable to communicate with the server.", ex);
+         }
+      }
+
+      // CHANGE PASSWORD
+      public async Task ChangePassword(ChangedPasswordDto changedPassword)
+      {
+         try
+         {
+            var response = await _http.PostAsJsonAsync($"api/userAccount/change-password", changedPassword);
+            //var userData = await response.Content.ReadFromJsonAsync<UserClaimsDto>();
+
+            if (response.IsSuccessStatusCode)
+            {
+               ErrorMessage = "Password changed successfully!";
+            }
             else
             {
-               throw new ApiException(MessageConstants.GenericError);
+               throw new ApiException(MessageConstants.OldPasswordMatchError);
+
+               //var errorContent = await response.Content.ReadAsStringAsync();
+               //ErrorMessage = errorContent;
             }
          }
          catch (HttpRequestException ex)
