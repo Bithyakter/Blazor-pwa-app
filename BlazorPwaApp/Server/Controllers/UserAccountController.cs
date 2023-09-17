@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -27,16 +28,12 @@ namespace BlazorPwaApp.Server.Controllers
          _context = context;
       }
 
+      #region Create
       [HttpPost]
       public async Task<ActionResult<List<UserAccount>>> CreateUserAccount(UserAccount userAccount)
       {
          try
          {
-            //var usernameInDb = _context.UserAccounts.FirstOrDefault(u =>u.Username == userAccount.Username);
-            
-            //if (usernameInDb.Username == userAccount.Username) 
-            //   return StatusCode(StatusCodes.Status400BadRequest, MessageConstants.DuplicateUserAccountError);
-
             EncryptionHelpers encryptionHelpers = new EncryptionHelpers();
             string encryptedPassword = encryptionHelpers.Encrypt(userAccount.Password);
             userAccount.Password = encryptedPassword;
@@ -51,7 +48,9 @@ namespace BlazorPwaApp.Server.Controllers
             return StatusCode(StatusCodes.Status500InternalServerError, MessageConstants.GenericError);
          }
       }
+      #endregion
 
+      #region Get UserAccounts
       [HttpGet]
       public async Task<ActionResult<List<UserAccount>>> GetUserAccounts()
       {
@@ -83,9 +82,11 @@ namespace BlazorPwaApp.Server.Controllers
             return StatusCode(StatusCodes.Status500InternalServerError, MessageConstants.GenericError);
          }
       }
+      #endregion
 
+      #region Update
       [HttpPut("{id}")]
-      public async Task<ActionResult<List<UserAccount>>> UpdateCountry(UserAccount userAccount, int id)
+      public async Task<ActionResult<List<UserAccount>>> UpdateUserAccount(UserAccount userAccount, int id)
       {
          try
          {
@@ -110,7 +111,9 @@ namespace BlazorPwaApp.Server.Controllers
             return StatusCode(StatusCodes.Status500InternalServerError, MessageConstants.GenericError);
          }
       }
+      #endregion
 
+      #region Delete
       [HttpDelete("{id}")]
       public async Task<ActionResult<List<UserAccount>>> DeleteUserAccount(int id)
       {
@@ -131,7 +134,9 @@ namespace BlazorPwaApp.Server.Controllers
             return StatusCode(StatusCodes.Status500InternalServerError, MessageConstants.GenericError);
          }
       }
+      #endregion
 
+      #region Login
       [HttpPost("userLogin")]
       public async Task<IActionResult> UserLogin(LoginDto login)
       {
@@ -140,7 +145,7 @@ namespace BlazorPwaApp.Server.Controllers
             EncryptionHelpers encryptionHelpers = new EncryptionHelpers();
             string encryptedPassword = encryptionHelpers.Encrypt(login.Password);
 
-            var userInDb = await _context.UserAccounts.SingleOrDefaultAsync(u =>u.Username == login.Username && u.Password == encryptedPassword);
+            var userInDb = await _context.UserAccounts.SingleOrDefaultAsync(u => u.Username == login.Username && u.Password == encryptedPassword);
 
             if (userInDb != null)
                return Ok(userInDb);
@@ -152,12 +157,9 @@ namespace BlazorPwaApp.Server.Controllers
             return StatusCode(StatusCodes.Status500InternalServerError, MessageConstants.GenericError);
          }
       }
+      #endregion 
 
-      private async Task<List<UserAccount>> GetDbUserAccounts()
-      {
-         return await _context.UserAccounts.ToListAsync();
-      }
-
+      #region Change Password
       [HttpPost("change-password")]
       public async Task<IActionResult> ChangedPassword(ChangedPasswordDto changePassword)
       {
@@ -184,39 +186,13 @@ namespace BlazorPwaApp.Server.Controllers
             return StatusCode(StatusCodes.Status500InternalServerError, MessageConstants.GenericError);
          }
       }
+      #endregion
 
-      //public async Task<IActionResult> ChangedPassword(ChangedPasswordDto changePassword)
-      //{
-      //   try
-      //   {
-      //      var userInDb = await _context.UserAccounts.SingleOrDefaultAsync(p =>p.Username == changePassword.Username && p.Password == changePassword.Password);
-
-      //      if (userInDb.Password == changePassword.Password)
-      //      {
-      //         if (userInDb != null)
-      //         {
-      //            userInDb.Password = changePassword.ConfirmPassword;
-
-      //            _context.UserAccounts.Update(userInDb);
-      //            await _context.SaveChangesAsync();
-
-      //            return Ok();
-      //         }
-      //         else
-      //         {
-      //            return StatusCode(StatusCodes.Status404NotFound, MessageConstants.NoMatchFoundError);
-      //         }
-      //      }
-      //      else
-      //      {
-      //         return StatusCode(StatusCodes.Status404NotFound, MessageConstants.NoMatchFoundError);
-      //      }
-      //   }
-      //   catch (Exception ex)
-      //   {
-      //      return StatusCode(StatusCodes.Status500InternalServerError, MessageConstants.GenericError);
-      //   }
-      //}
+      #region Read All
+      private async Task<List<UserAccount>> GetDbUserAccounts()
+      {
+         return await _context.UserAccounts.ToListAsync();
+      }
 
       [HttpGet("IsAccountDuplicate/{username}")]
       public async Task<ActionResult<bool>> IsAccountDuplicate(string username)
@@ -235,89 +211,50 @@ namespace BlazorPwaApp.Server.Controllers
             return StatusCode(StatusCodes.Status500InternalServerError);
          }
       }
+      #endregion
 
-      //private async Task<bool> IsAccountDuplicate(UserAccount userAccount)
+      //[HttpPost("userLogin")]
+      //public async Task<IActionResult> UserLogin(LoginDto login)
       //{
       //   try
       //   {
-      //      var userAccountInDb = await _context.UserAccounts.SingleOrDefaultAsync(u =>u.Username == userAccount.Username);
+      //      EncryptionHelpers encryptionHelpers = new EncryptionHelpers();
+      //      string encryptedPassword = encryptionHelpers.Encrypt(login.Password);
 
-      //      if (userAccountInDb != null)
-      //         if (userAccountInDb.Oid != userAccount.Oid)
+      //      var userInDb = await _context.UserAccounts.SingleOrDefaultAsync(u => u.Username == login.Username && u.Password == encryptedPassword);
 
-      //            return true;
-
-      //      return false;
-      //   }
-      //   catch
-      //   {
-      //      throw;
-      //   }
-      //}
-
-      //[HttpPost("login")]
-      //public async Task<IActionResult> Login(LoginDto login)
-      //{
-      //   try
-      //   {
-      //      // Find the user by their username
-      //      var user = await _userManager.FindByNameAsync(login.Username);
-
-      //      if (user == null)
+      //      if (userInDb != null)
       //      {
-      //         return BadRequest("Invalid login attempt.");
-      //      }
-
-      //      // Check if the provided password is valid
-      //      var result = await _signInManager.CheckPasswordSignInAsync(user, login.Password, lockoutOnFailure: false);
-
-      //      if (result.Succeeded)
-      //      {
-      //         // Generate an access token or return a success message
-      //         // You can use JWT authentication or another method to generate tokens
-
-      //         // For example, using JWT:
-      //         var token = GenerateJwtToken(user);
-
-      //         return Ok(new
-      //         {
-      //            Message = "Login successful",
-      //            Token = token
-      //         });
-      //      }
-
-      //      if (result.IsLockedOut)
-      //      {
-      //         return BadRequest("User account locked out.");
+      //         var token = GenerateJwtToken(userInDb.Username);
+      //         return Ok(new { token });
       //      }
       //      else
       //      {
-      //         return BadRequest("Invalid login attempt.");
+      //         return StatusCode(StatusCodes.Status404NotFound, MessageConstants.NoMatchFoundError);
       //      }
       //   }
       //   catch (Exception ex)
       //   {
-      //      return BadRequest(ex.Message);
+      //      return StatusCode(StatusCodes.Status500InternalServerError, MessageConstants.GenericError);
       //   }
       //}
 
-      //private string GenerateJwtToken(UserAccount user)
+      //private string GenerateJwtToken(string username, IConfiguration configuration)
       //{
-      //   var claims = new List<Claim>
-      //    {
-      //        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-      //        new Claim(ClaimTypes.Name, user.UserName),
-      //        // Add more claims as needed
-      //    };
+      //   var claims = new[]
+      //   {
+      //  new Claim(ClaimTypes.Name, username),
+      //  // Add more claims as needed
+      //};
 
-      //   var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["JwtKey"]));
+      //   var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JwtSettings:SecretKey"]));
       //   var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
       //   var token = new JwtSecurityToken(
-      //       issuer: Configuration["JwtIssuer"],
-      //       audience: Configuration["JwtIssuer"],
+      //       issuer: configuration["JwtSettings:Issuer"],
+      //       audience: configuration["JwtSettings:Audience"],
       //       claims: claims,
-      //       expires: DateTime.UtcNow.AddMinutes(30), // Set the token expiration time
+      //       expires: DateTime.Now.AddMinutes(Convert.ToDouble(configuration["JwtSettings:ExpirationInMinutes"])),
       //       signingCredentials: creds
       //   );
 
@@ -325,3 +262,72 @@ namespace BlazorPwaApp.Server.Controllers
       //}
    }
 }
+
+//[HttpPost("login")]
+//public async Task<IActionResult> Login(LoginDto login)
+//{
+//   try
+//   {
+//      // Find the user by their username
+//      var user = await _userManager.FindByNameAsync(login.Username);
+
+//      if (user == null)
+//      {
+//         return BadRequest("Invalid login attempt.");
+//      }
+
+//      // Check if the provided password is valid
+//      var result = await _signInManager.CheckPasswordSignInAsync(user, login.Password, lockoutOnFailure: false);
+
+//      if (result.Succeeded)
+//      {
+//         // Generate an access token or return a success message
+//         // You can use JWT authentication or another method to generate tokens
+
+//         // For example, using JWT:
+//         var token = GenerateJwtToken(user);
+
+//         return Ok(new
+//         {
+//            Message = "Login successful",
+//            Token = token
+//         });
+//      }
+
+//      if (result.IsLockedOut)
+//      {
+//         return BadRequest("User account locked out.");
+//      }
+//      else
+//      {
+//         return BadRequest("Invalid login attempt.");
+//      }
+//   }
+//   catch (Exception ex)
+//   {
+//      return BadRequest(ex.Message);
+//   }
+//}
+
+//private string GenerateJwtToken(UserAccount user)
+//{
+//   var claims = new List<Claim>
+//    {
+//        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+//        new Claim(ClaimTypes.Name, user.UserName),
+//        // Add more claims as needed
+//    };
+
+//   var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["JwtKey"]));
+//   var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+//   var token = new JwtSecurityToken(
+//       issuer: Configuration["JwtIssuer"],
+//       audience: Configuration["JwtIssuer"],
+//       claims: claims,
+//       expires: DateTime.UtcNow.AddMinutes(30), // Set the token expiration time
+//       signingCredentials: creds
+//   );
+
+//   return new JwtSecurityTokenHandler().WriteToken(token);
+//}

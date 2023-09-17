@@ -12,6 +12,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.AspNetCore.Components.Server;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -59,6 +62,21 @@ else
    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
    app.UseHsts();
 }
+
+//builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+//.AddJwtBearer(options =>
+//{
+//   options.TokenValidationParameters = new TokenValidationParameters
+//   {
+//      ValidateIssuer = true,
+//      ValidIssuer = "https://yourapp.com", 
+//      ValidateAudience = true,
+//      ValidAudience = "MyApp", 
+//      ValidateIssuerSigningKey = true,
+//      IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("bithy@93")), 
+//      ValidateLifetime = true,
+//   };
+//});
 
 app.UseHttpsRedirection();
 
