@@ -1,0 +1,179 @@
+﻿@page "/createuserAccount"
+@page "/createuserAccount/{id:int}"
+@layout MainLayout
+@inject IUserAccountService UserAccountService
+@inject IJSRuntime JsRuntime
+@inject NavigationManager NavigationManager
+@using BlazorPwaApp.Shared.Entities
+@using Microsoft.AspNetCore.Components.Forms
+@using static BlazorPwaApp.Shared.Constants.Enums;
+@using static BlazorPwaApp.Client.Services.UserAccountService.UserAccountService;
+
+@if (Id == null)
+{
+   <PageTitle>Create a new Account</PageTitle>
+   <h3 class="text-center fw-bold">Create a new Account</h3>
+}
+else
+{
+   <PageTitle>Edit @userAccount.Username</PageTitle>
+   <h3>Edit @userAccount.Username</h3>
+}
+
+@if (!string.IsNullOrEmpty(ErrorMessage))
+{
+   <p class="text-danger">@ErrorMessage</p>
+}
+
+<div class="row">
+   <div class="col-md-10">
+      <div class="card">
+         <div class="card-header">
+               <Span>User Registration</Span>
+         </div>
+         <div class="card-body ps-5 pe-5">
+
+            <EditForm Model="userAccount" OnSubmit="HandleSubmit">
+               <DataAnnotationsValidator />
+
+               <div class="form-group row mt-2">
+                  <label class="control-label col-md-12 required">First Name</label>
+                  <div class="col">
+                     <InputText class="form-control" @bind-Value="userAccount.FirstName" />
+                     <ValidationMessage For="@(() => userAccount.FirstName)" />
+                  </div>
+               </div>
+
+               <div class="form-group row mt-3">
+                  <label class="control-label col-md-12 required">Last Name</label>
+                  <div class="col">
+                     <InputText class="form-control" @bind-Value="userAccount.Lastname" />
+                     <ValidationMessage For="@(() => userAccount.Lastname)" />
+                  </div>
+               </div>
+
+               <div class="form-group row mt-3">
+                  <label class="control-label col-md-12 required">Sex</label>
+                  <div class="col">
+                     <InputSelect id="Sex" @bind-Value="userAccount.Sex" class="form-control">
+                           @foreach (Sex sex in Enum.GetValues(typeof(Sex)))
+                           {
+                              <option value="@sex">@sex.ToString()</option>
+                           }
+                     </InputSelect>
+                     <ValidationMessage For="@(() => userAccount.Sex)" />
+                  </div>
+               </div>
+
+               <div class="form-group row mt-3">
+                  <label class="control-label col-md-12 required">Date of birth</label>
+                  <div class="col">
+                     <InputDate @bind-Value="userAccount.DOB" Format="dd/mm/yyyy" Class="form-control" />
+                     <ValidationMessage For="@(() => userAccount.DOB)" />
+                  </div>
+               </div>
+
+               <div class="form-group row mt-3">
+                  <label class="control-label col-md-12 required">User Name</label>
+                  <div class="col">
+                     <InputText class="form-control" @bind-Value="userAccount.Username" />
+                     <ValidationMessage For="@(() => userAccount.Username)" />
+                  </div>
+               </div>
+
+               <div class="form-group row mt-3">
+                  <label class="control-label col-md-12 required">Password</label>
+                  <div class="col">
+                     <InputText type="password" class="form-control" @bind-Value="userAccount.Password"></InputText>
+                     <ValidationMessage For="@(() => userAccount.Password)" />
+                  </div>
+               </div>
+
+               <div class="form-group row mt-3">
+                  <label class="control-label col-md-12 required">Confirm Password</label>
+                  <div class="col">
+                     <InputText type="password" class="form-control" @bind-Value="userAccount.ConfirmPassword"></InputText>
+                     <ValidationMessage For="@(() => userAccount.ConfirmPassword)" />
+                  </div>
+               </div>               
+
+               <div class="form-group mb-4 mt-4" align="center">
+                     <button type="submit" class="btn btn-primary">@btnText</button>
+
+                    @* @if (Id != null)
+                     {
+                        <button type="button" class="btn btn-danger mx-2" @onclick="DeleteUserAccount">Delete UserAccount</button>
+                     }
+                     else
+                     {*@
+                        <button type="button" class="btn btn-danger mx-2" @onclick="GoToUserAccountPage">Back</button>
+                     @*}*@
+               </div>
+            </EditForm>
+
+         </div>
+      </div>
+   </div>
+</div>
+
+@code {
+   [Parameter]
+   public int? Id { get; set; }
+
+   string btnText = string.Empty;
+   string ErrorMessage = string.Empty;
+
+   UserAccount userAccount = new UserAccount();
+
+   protected override async Task OnInitializedAsync()
+   {
+      btnText = Id == null ? "Register" : "Update UserAccount";
+
+      await UserAccountService.GetUserAccounts();
+   }
+
+   protected override async Task OnParametersSetAsync()
+   {
+      if (Id == null)
+      {
+         userAccount = new UserAccount();
+      }
+      else
+      {
+         userAccount = await UserAccountService.GetUserAccountByKey((int)Id);
+      }
+   }
+
+   async Task HandleSubmit()
+   {
+      if (Id == null)
+      {
+         try
+         {
+            await UserAccountService.CreateUserAccount(userAccount);
+
+            await JsRuntime.InvokeVoidAsync("alert", "Saved Successfully!");
+            NavigationManager.NavigateTo("userAccounts");
+         }
+         catch (Exception ex)
+         {
+            ErrorMessage = "Please fill in all required fields.";
+         }
+      }
+      else
+      {
+         await UserAccountService.UpdateUserAccount(userAccount);
+         await JsRuntime.InvokeVoidAsync("alert", "Updated Successfully!");
+      }
+   } 
+
+   async Task DeleteUserAccount()
+   {
+      await UserAccountService.DeleteUserAccount(userAccount.Oid);
+   }
+
+   private void GoToUserAccountPage()
+   {
+      NavigationManager.NavigateTo("/UserAccounts");
+   }
+}

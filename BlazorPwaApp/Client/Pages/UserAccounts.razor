@@ -1,0 +1,127 @@
+﻿@page "/userAccounts"
+@layout MainLayout
+@using BlazorPwaApp.Client.Services.UserAccountService;
+@using BlazorPwaApp.Shared.Entities;
+@using static System.Net.WebRequestMethods;
+@inject IUserAccountService UserAccountService
+@inject IJSRuntime js
+@inject NavigationManager NavigationManager
+
+<PageTitle>User Accounts</PageTitle>
+
+<h3>User Accounts</h3>
+
+@*<button class="btn btn-primary" @onclick="CreateNewUserAccount">Create New User Account</button>*@
+<div class="row">
+   <div class="col-md-8">
+      <button class="btn btn-primary" @onclick="CreateNewUserAccount"><i class="fas fa-user-plus"></i> Create New User Account</button>
+   </div>
+
+   <div class="input-group col">
+      <input type="text" class="form-control" placeholder="Search user by username"
+      @bind="SearchString" @bind:event="oninput" @onkeyup="FilterUserAccounts" />
+      @if (SearchString.Length > 0)
+      {
+         <div class="input-group-append">
+            <button class="btn btn-danger" @onclick="ResetSearch" style="font-size: 12px; margin-top: 5px; margin-left: 5px;">
+               <i class="oi oi-reload"></i>
+            </button>
+         </div>
+      }
+   </div>
+</div>
+
+@if (list != null)
+{
+   <table class="table">
+      <thead>
+         <tr>
+            <th>First name</th>
+            <th>Last name</th>
+            <th>Username</th>
+            <th>Date of birth</th>
+            <th>Sex</th>
+            @*<th>Password</th>*@
+            <th></th>
+         </tr>
+      </thead>
+
+      <tbody>
+         @foreach (var user in list)
+         {
+            <tr>
+               <td>@user.FirstName</td>
+               <td>@user.Lastname</td>
+               <td>@user.Username</td>
+               <td>@user.DOB?.ToString("dd/MM/yy")</td>
+               <td>@user.Sex</td>
+               @*<td>@user.Password</td>*@
+               <td>
+                  <button class="btn btn-primary" @onclick="(() => ShowUserAccount(user.Oid))"><i class="oi oi-pencil"></i></button>
+                  <button type="button" class="btn btn-danger mx-2" @onclick="(() => ConfirmDelete(user.Oid, user.Username))"><i class="oi oi-delete"></i></button>
+               </td>
+            </tr>
+         }
+      </tbody>
+   </table>
+}
+
+@code {
+
+   protected List<UserAccount> list = new List<UserAccount>();
+   protected List<UserAccount> searchUserData = new();
+   protected string SearchString { get; set; } = string.Empty;
+
+   protected override async Task OnInitializedAsync()
+   {
+      await LoadUserAccounts();
+   }
+
+   private async Task LoadUserAccounts()
+   {
+      var userAccounts = await UserAccountService.GetUserAccounts();
+      list = userAccounts;
+      searchUserData = userAccounts;
+   }
+
+   protected void FilterUserAccounts()
+   {
+      if (!string.IsNullOrEmpty(SearchString))
+         list = searchUserData.Where(x => x.Username.IndexOf(SearchString, StringComparison.OrdinalIgnoreCase) != -1).ToList();
+      else
+         list = searchUserData;
+   }
+
+   public void ResetSearch()
+   {
+      SearchString = string.Empty;
+      list = searchUserData;
+   }
+
+   //protected override async Task OnInitializedAsync()
+   //{
+   //   await UserAccountService.GetUserAccounts();
+   //}
+
+   void ShowUserAccount(int id)
+   {
+      NavigationManager.NavigateTo($"createuserAccount/{id}");
+   }
+
+   void CreateNewUserAccount()
+   {
+      NavigationManager.NavigateTo("/createuserAccount");
+   }
+
+   async Task ConfirmDelete(int id, string user)
+   {
+      if (await js.InvokeAsync<bool>("confirm", $"Do you want to delete {user}'s ({id}) Record?"))
+      {
+         await UserAccountService.DeleteUserAccount(id);
+
+         var deletedUserAccount = list.FirstOrDefault(c => c.Oid == id);
+         if (deletedUserAccount != null)
+            list.Remove(deletedUserAccount);
+      }
+   }
+}

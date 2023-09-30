@@ -24,5 +24,14 @@ namespace BlazorPwaApp.Shared.Constants
 
       public const string RecordDeletedSuccessfully = "Record deleted successfully!";
 
+      public const string PasswordLengthError = "Password should be at least 6 characters!";
+
+      public const string PasswordMatchError = "The password and confirm password fields do not match.";
+
+      public const string DuplicateUserAccountError = "Username already exists!";
+
+      public const string OldPasswordMatchError = "The old password does not match!";
+
+      public const string OldAndNewPasswordMatchError = "The New Password should not match with current password!";
    }
 }

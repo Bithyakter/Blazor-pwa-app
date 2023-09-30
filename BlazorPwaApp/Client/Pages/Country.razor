@@ -1,6 +1,10 @@
 ﻿@page "/countries"
+@attribute [Authorize]
+@layout MainLayout
 @using BlazorPwaApp.Client.Services.CountryService;
 @using static System.Net.WebRequestMethods;
+@using BlazorPwaApp.Shared.Entities;
+@using Microsoft.AspNetCore.Authorization;
 @inject ICountryService CountryService
 @inject IJSRuntime js
 @inject NavigationManager NavigationManager
@@ -9,45 +13,90 @@
 
 <h3>Countries</h3>
 
-<button class="btn btn-primary" @onclick="CreateNewCountry">Create New Country</button>
+<div class="row">
+   <div class="col-md-8">
+      <button class="btn btn-primary" @onclick="CreateNewCountry">Create New Country</button>
+   </div>
 
-<table class="table">
-   <thead>
-      <tr>
-         <th>Country name</th>
-         <th>Country code</th>
-         <th>ISO Code2</th>
-         <th></th>
-      </tr>
-   </thead>
-
-   <tbody>
-      @foreach (var country in CountryService.Countries)
+   <div class="input-group col">
+      <input type="text" class="form-control" placeholder="Search country by name"
+      @bind="SearchString" @bind:event="oninput" @onkeyup="FilterCountry" />
+      @if (SearchString.Length > 0)
       {
-         <tr>
-            <td>@country.CountryName</td>
-            <td>@country.CountryCode</td>
-            <td>@country.ISOCode2</td>
-            <td>
-               <button class="btn btn-primary" @onclick="(() => ShowCountry(country.Oid))"><i class="oi oi-pencil"></i></button>
-               @*<button type="button" class="btn btn-danger mx-2" @onclick="(() => DeleteCountry(country.Oid))"><i class="oi oi-delete"></i></button>*@
-               <button type="button" class="btn btn-danger mx-2" @onclick="(() => ConfirmDelete(country.Oid, country.CountryName))"><i class="oi oi-delete"></i></button>
-            </td>
-         </tr>
+         <div class="input-group-append">
+            <button class="btn btn-danger" @onclick="ResetSearch" style="font-size: 12px; margin-top: 5px; margin-left: 5px;">
+               <i class="oi oi-reload"></i>
+            </button>
+         </div>
       }
-   </tbody>
-</table>
+   </div>
+</div>
+
+@if (list != null)
+{
+   <table class="table">
+      <thead>
+         <tr>
+            <th>Country name</th>
+            <th>Country code</th>
+            <th>ISO Code2</th>
+            <th></th>
+         </tr>
+      </thead>
+
+      <tbody>
+         @foreach (var country in list)
+         {
+            <tr>
+               <td>@country.CountryName</td>
+               <td>@country.CountryCode</td>
+               <td>@country.ISOCode2</td>
+               <td>
+                  <button class="btn btn-primary" @onclick="(() => ShowCountry(country.Oid))"><i class="oi oi-pencil"></i></button>                  
+                  <button type="button" class="btn btn-danger mx-2" @onclick="(() => ConfirmDelete(country.Oid, country.CountryName))"><i class="oi oi-delete"></i></button>
+               </td>
+            </tr>
+         }
+      </tbody>
+   </table>
+}
 
 @code {
 
-   protected List<Country> list = new List<Country>();
-
-   [Parameter]
-   public string Id { get; set; }
+   protected List<BlazorPwaApp.Shared.Entities.Country> list = new List<BlazorPwaApp.Shared.Entities.Country>();
+   protected List<BlazorPwaApp.Shared.Entities.Country> searchCountryData = new();
+   protected string SearchString { get; set; } = string.Empty;
 
    protected override async Task OnInitializedAsync()
    {
-      await CountryService.GetCountries();
+      await LoadCountries();
+   }
+
+   private async Task LoadCountries()
+   {
+       var countries = await CountryService.GetCountries();
+       list = countries;
+       searchCountryData = countries;
+   }
+
+   protected void FilterCountry()
+   {
+      if (!string.IsNullOrEmpty(SearchString))
+      {
+         list = searchCountryData
+             .Where(x => x.CountryName.IndexOf(SearchString, StringComparison.OrdinalIgnoreCase) != -1)
+             .ToList();
+      }
+      else
+      {
+         list = searchCountryData;
+      }
+   }
+
+   public void ResetSearch()
+   {
+      SearchString = string.Empty;
+      list = searchCountryData;
    }
 
    void ShowCountry(int id)
@@ -60,18 +109,41 @@
       NavigationManager.NavigateTo("/createcountry");
    }
 
-   //async Task DeleteCountry(int countryId)
-   //{
-   //   await CountryService.DeleteCountry(countryId);
-   //   await CountryService.GetCountries();
-   //}
-
    async Task ConfirmDelete(int id, string countryName)
    {
       if (await js.InvokeAsync<bool>("confirm", $"Do you want to delete {countryName}'s ({id}) Record?"))
       {
          await CountryService.DeleteCountry(id);
-         await CountryService.GetCountries();
+
+         // Find and remove the deleted country from the list
+         var deletedCountry = list.FirstOrDefault(c => c.Oid == id);
+         if (deletedCountry != null)
+         {
+            list.Remove(deletedCountry);
+         }
+      }
+   }  
+}
+
+@*<button class="btn btn-primary" @onclick="CreateNewCountry"><i class="fas fa-user-plus"></i> Create New Country</button>*@
+@*<button type="button" class="btn btn-danger mx-2" @onclick="(() => DeleteCountry(country.Oid))"><i class="oi oi-delete"></i></button>*@
+
+   @*async Task ConfirmDelete(int id, string countryName)
+   {
+      if (await js.InvokeAsync<bool>("confirm", $"Do you want to delete {countryName}'s ({id}) Record?"))
+      {
+        await CountryService.DeleteCountry(id);
+        await CountryService.GetCountries();
       }
    }
-}
+
+   protected override async Task OnInitializedAsync()
+   {
+      await CountryService.GetCountries();
+   }*@
+
+   @* async Task DeleteCountry(int countryId)
+   {
+      await CountryService.DeleteCountry(countryId);
+      await CountryService.GetCountries();
+   }*@

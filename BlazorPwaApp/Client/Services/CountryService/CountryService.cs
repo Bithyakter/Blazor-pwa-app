@@ -55,12 +55,25 @@ namespace BlazorPwaApp.Client.Services.CountryService
       }
 
       //GET ALL COUNTRIES
-      public async Task GetCountries()
+      //public async Task GetCountries()
+      //{
+      //   var result = await _http.GetFromJsonAsync<List<Country>>("api/country");
+
+      //   if (result != null)
+      //      Countries = result;
+      //}
+
+      public async Task<List<Country>> GetCountries()
       {
          var result = await _http.GetFromJsonAsync<List<Country>>("api/country");
 
          if (result != null)
+         {
             Countries = result;
+            return result;
+         }
+
+         return new List<Country>();
       }
 
       //SET COUNTRY

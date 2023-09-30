@@ -1,12 +1,14 @@
 ﻿using BlazorPwaApp.Server.AppDbContext;
 using BlazorPwaApp.Shared.Constants;
 using BlazorPwaApp.Shared.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace BlazorPwaApp.Server.Controllers
 {
+   //[Authorize]
    [Route("api/[controller]")]
    [ApiController]
    public class CountryController : ControllerBase
@@ -52,7 +54,7 @@ namespace BlazorPwaApp.Server.Controllers
       }
 
       [HttpPost]
-      public async Task<ActionResult<List<Country>>> CreateComic(Country country)
+      public async Task<ActionResult<List<Country>>> CreateCountry(Country country)
       {
          try
          {

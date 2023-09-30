@@ -1,8 +1,44 @@
+using BlazorPwaApp.Client.Services;
+using BlazorPwaApp.Client.Services.UserAccountService;
+using BlazorPwaApp.Server;
 using BlazorPwaApp.Server.AppDbContext;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Components.Web;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.AspNetCore.Components.Server;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
+
+//builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+//    .AddCookie(options =>
+//    {
+//       options.LoginPath = "/login"; // Set the login page URL
+//       options.AccessDeniedPath = "/accessdenied"; // Set the access denied page URL
+//    });
+
+//builder.Services.AddAuthorization(options =>
+//{
+//   options.AddPolicy("RequireAuthenticatedUser", policy =>
+//   {
+//      policy.RequireAuthenticatedUser();
+//   });
+//});
+
+// USE SESSION
+builder.Services.AddDistributedMemoryCache(); 
+builder.Services.AddSession(options =>
+{
+   options.IdleTimeout = TimeSpan.FromMinutes(30); // Session timeout duration
+});
 
 // Add services to the container.
 
@@ -10,6 +46,8 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 
 builder.Services.AddDbContext<DataContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddMvc();
 
 var app = builder.Build();
 
@@ -25,12 +63,31 @@ else
    app.UseHsts();
 }
 
+//builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+//.AddJwtBearer(options =>
+//{
+//   options.TokenValidationParameters = new TokenValidationParameters
+//   {
+//      ValidateIssuer = true,
+//      ValidIssuer = "https://yourapp.com", 
+//      ValidateAudience = true,
+//      ValidAudience = "MyApp", 
+//      ValidateIssuerSigningKey = true,
+//      IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("bithy@93")), 
+//      ValidateLifetime = true,
+//   };
+//});
+
 app.UseHttpsRedirection();
 
 app.UseBlazorFrameworkFiles();
 app.UseStaticFiles();
 
 app.UseRouting();
+
+app.UseAuthentication();
+app.UseAuthorization();
+app.UseSession();
 
 app.MapRazorPages();
 app.MapControllers();

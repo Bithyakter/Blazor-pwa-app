@@ -1,17 +1,264 @@
-﻿@inherits LayoutComponentBase
+﻿
+@inherits LayoutComponentBase
+@inject ISessionService SessionService
+@inject NavigationManager NavigationManager
+@using BlazorPwaApp.Client.Services;
+@using BlazorPwaApp.Shared.Dto;
+
+<PageTitle>Blazor App</PageTitle>
 
 <div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
+   <div class="sidebar">
+      <NavMenu />
+   </div>
 
-    <main>
-        <div class="top-row px-4">
-            <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
-        </div>
+   <main>
+      <div class="top-row px-4">
+         <nav class="header-nav ms-auto">
+            <ul class="d-flex align-items-center">
 
-        <article class="content px-4">
-            @Body
-        </article>
-    </main>
+               <li class="nav-item dropdown pe-3" style="">
+
+                  <a id="userDropdown" class="nav-link nav-profile d-flex align-items-center pe-0" href="javascript:void(0)" data-toggle="dropdown" @onclick="ToggleDropdown">
+                     <i class="oi oi-person"></i>
+                     <span class="d-none d-md-block dropdown-toggle ps-2 pt-2">@user?.FirstName  @user?.Lastname</span>
+                  </a>
+
+                  <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile" style="display: @(showDropdown ? "block" : "none")">
+                     <li class="dropdown-header">
+                        <h6>@user?.FirstName @user?.Lastname</h6>
+                        <span>Administrator</span>
+                     </li>
+                     <li>
+                           <hr class="dropdown-divider">
+                     </li>
+                     <li>
+                        <a class="dropdown-item d-flex align-items-center ps-0" href="javascript:void(0)" @onclick="NavigateToChangePassword">
+                           <i class="bi bi-question-circle"></i>
+                           <span>Change Password</span>
+                        </a>
+                     </li>
+                     <li>
+                           <hr class="dropdown-divider">
+                     </li>
+
+                     <li>
+                        <a class="dropdown-item d-flex align-items-center" href="javascript:void(0)" @onclick="HandleLogout">
+                           <i class="oi oi-arrow-right"></i>
+                           <span> Sign Out</span>
+                        </a>
+                     </li>
+                  </ul>
+               </li>
+
+            </ul>
+         </nav>
+      </div>
+
+      <article class="content px-4">
+         @Body
+      </article>
+   </main>
 </div>
+
+<link href="css/app.css" rel="stylesheet" />
+
+@code {
+   private UserClaimsDto user;
+   private bool showDropdown = false;
+
+   protected override async Task OnInitializedAsync()
+   {
+      user = await SessionService.GetItemAsync<UserClaimsDto>("user");
+   }
+
+   private async Task HandleLogout()
+   {
+      await SessionService.RemoveItemAsync("user");
+      NavigationManager.NavigateTo("/login");
+   }
+
+   private void ToggleDropdown()
+   {
+      showDropdown = !showDropdown;
+   }
+
+   private async Task NavigateToChangePassword()
+   {
+      NavigationManager.NavigateTo("/changepassword");
+   }
+}
+
+<style>
+.top-row[b-lc69yfa6me] {
+   /*height: 60px;*/
+   box-shadow: rgba(1, 41, 112, 0.1) 9px 2px 20px !important;
+      background-color: rgb(255, 255, 255) !important;
+      padding-left: 20px !important;
+      transition: all 0.5s ease 0s !important;
+      padding-left: 0 !important;
+      border-bottom: none !important;
+}
+
+.nav-item[b-9d2ykqx8qf] a.active{
+      color: rgb(65, 84, 241) !important;
+      background: rgb(246, 249, 255) !important;
+}
+
+.top-row[b-9d2ykqx8qf] {
+      height: 3.5rem !important;
+      background-color: rgb(255, 255, 255) !important;
+}
+
+.navbar-brand[b-9d2ykqx8qf] {
+      font-size: 1.4rem !important;
+}
+
+.navbar-dark .navbar-brand {
+      font-size: 25px !important;
+      font-weight: 700 !important;
+   /*color: rgb(1, 41, 112);*/
+}
+
+.navbar-brand {
+      padding-top: 0 !important;
+      padding-bottom: 0.3125rem !important;
+      margin-right: 1rem;
+      font-size: 1.25rem !important;
+      text-decoration: none !important;
+      white-space: nowrap !important;
+      color: rgb(1, 41, 112) !important;
+}
+
+.top-row.ps-3.navbar.navbar-dark {
+      box-shadow: rgba(1, 41, 112, 0.1) 9px 2px 20px !important;
+}
+
+.sidebar[b-lc69yfa6me] {
+      background-image: none !important;
+      box-shadow: rgba(1, 41, 112, 0.1) 0px 0px 20px !important;
+      background-color: rgb(255, 255, 255) !important;
+      transition: all 0.3s ease 0s !important;
+}
+
+.nav-item[b-9d2ykqx8qf] a:hover {
+      color: rgb(65, 84, 241) !important;
+      background: rgb(246, 249, 255) !important;
+}
+
+.nav-item[b-9d2ykqx8qf] a {
+      color: rgb(1, 41, 112) !important;
+      font-weight: 600 !important;
+      font-size: 15px !important;
+}
+
+.card-header, .card-footer {
+      border-color: #ebeef4 !important;
+      background-color: #fff !important;
+      padding: 15px !important;
+      color: rgb(1, 41, 112) !important;
+      font-size: 18px !important;
+}
+
+.nav-item[b-v9qlxlo4j3] a.active {
+   /*background-color: rgba(255,255,255,0.25);*/
+      color: rgb(65, 84, 241) !important;
+      background: rgb(246, 249, 255) !important;
+}
+
+.navbar-dark .navbar-brand:focus, .navbar-dark .navbar-brand:hover {
+      color: rgb(1, 41, 112) !important;
+}
+
+span.bi.bi-circle {
+      font-size: 6px !important;
+      margin-right: 8px !important;
+      line-height: 0 !important;
+      border-radius: 50% !important;
+}
+
+.sidebar-nav .nav-content .nav-link {
+   background-color: white !important;
+}
+
+.top-row[b-7h0cgpplwh] a, .top-row .btn-link[b-7h0cgpplwh] {
+      white-space: nowrap !important;
+      margin-left: 1.5rem !important;
+      color: rgb(1, 41, 112) !important;
+      font-weight: 700 !important;
+      margin-top: 15px !important;
+}
+
+.header-nav ul {
+      list-style-type: none !important;
+}
+
+.header-nav .nav-profile {
+   color: #012970;
+}
+
+   .header-nav .profile {
+      min-width: 240px;
+      padding-bottom: 0;
+      top: 8px !important;
+   }
+   .dropdown-menu .dropdown-header, .dropdown-menu .dropdown-footer {
+      text-align: center;
+      font-size: 14px;
+      padding: 10px 25px;
+   }
+
+   .dropdown-header {
+      display: block;
+      padding: var(--bs-dropdown-header-padding-y) var(--bs-dropdown-header-padding-x);
+      margin-bottom: 0;
+      font-size: .875rem;
+      color: var(--bs-dropdown-header-color);
+      white-space: nowrap;
+   }
+
+   .header-nav ul {
+      list-style: none;
+   }
+
+   .dropdown-menu {
+      border-radius: 4px;
+      padding: 10px 0;
+      -webkit-animation-name: dropdown-animate;
+      animation-name: dropdown-animate;
+      -webkit-animation-duration: 0.2s;
+      animation-duration: 0.2s;
+      -webkit-animation-fill-mode: both;
+      animation-fill-mode: both;
+      border: 0;
+      box-shadow: 0 5px 30px 0 rgba(82, 63, 105, 0.2);
+   }
+
+   .nav-item a {
+      text-decoration: none;
+   }
+
+   ul.dropdown-menu.dropdown-menu-end.dropdown-menu-arrow.profile.show {
+      position: absolute;
+      inset: 0px 0px auto auto;
+      margin: 0px;
+      transform: translate3d(-16px, 26px, 0px);
+   }
+
+   .header-nav .nav-profile span {
+      font-size: 14px;
+      font-weight: 600;
+   }
+
+   .dropdown, .dropdown-center, .dropend, .dropstart, .dropup, .dropup-center {
+      position: relative;
+   }
+
+   .header-nav .profile {
+      min-width: 156px !important;
+      padding-bottom: 8px;
+      top: 45px !important;
+      margin-left: 28px;
+   }
+
+</style>

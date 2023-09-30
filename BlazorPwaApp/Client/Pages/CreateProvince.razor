@@ -1,5 +1,7 @@
 ﻿@page "/createprovince"
 @page "/createprovince/{id:int}"
+@layout MainLayout
+@inject IJSRuntime JsRuntime
 @inject IProvinceService ProvinceService
 @inject NavigationManager NavigationManager
 
@@ -19,37 +21,51 @@ else
    <p class="text-danger">@ErrorMessage</p>
 }
 
-<EditForm Model="province" OnSubmit="HandleSubmit">
-   <DataAnnotationsValidator />
-   <div class="mt-3">
-      <label>Country</label><br />
-      <InputSelect @bind-Value="province.CountryId" class="form-select">
-         @foreach (var country in ProvinceService.Countries)
-         {
-            <option value="@country.Oid">@country.CountryName</option>
-         }
-      </InputSelect>
-      <ValidationMessage For="@(() => province.Country.CountryName)" />
+<div class="row">
+   <div class="col-md-10">
+      <div class="card">
+         <div class="card-header">
+            <Span>Province</Span>
+         </div>
+         <div class="card-body ps-5 pe-5 mb-4">
+
+            <EditForm Model="province" OnSubmit="HandleSubmit">
+               <DataAnnotationsValidator />
+
+               <div class="mt-3">
+                  <label class="required">Country</label><br />
+                  <InputSelect @bind-Value="province.CountryId" class="form-select">
+                     @foreach (var country in ProvinceService.Countries)
+                     {
+                        <option value="@country.Oid">@country.CountryName</option>
+                     }
+                  </InputSelect>
+                  <ValidationMessage For="@(() => province.Country.CountryName)" />
+               </div>
+
+                <div class="mt-3">
+                     <label for="ProvinceName" class="required">Province Name</label>
+                     <InputText id="ProvinceName" @bind-Value="province.ProvinceName" class="form-control"></InputText>
+                     <ValidationMessage For="@(() => province.ProvinceName)" />
+                </div> 
+
+                <br />
+
+               <button type="submit" class="btn btn-primary">@btnText</button>
+               @*@if (Id != null)
+               {
+                  <button type="button" class="btn btn-danger mx-2" @onclick="DeleteProvince">Delete Province</button>
+               }
+               else
+               {*@
+                  <button type="button" class="btn btn-danger mx-2" @onclick="GoToProvincePage">Back</button>
+               @*}*@
+            </EditForm>
+
+         </div>
+      </div>
    </div>
-
-    <div class="mt-3">
-         <label for="ProvinceName">Province Name</label>
-         <InputText id="ProvinceName" @bind-Value="province.ProvinceName" class="form-control"></InputText>
-         <ValidationMessage For="@(() => province.ProvinceName)" />
-    </div> 
-
-    <br />
-
-   <button type="submit" class="btn btn-primary">@btnText</button>
-   @if (Id != null)
-   {
-      <button type="button" class="btn btn-danger mx-2" @onclick="DeleteProvince">Delete Province</button>
-   }
-   else
-   {
-      <button type="button" class="btn btn-danger mx-2" @onclick="GoToProvincePage">Back</button>
-   }
-</EditForm>
+</div>
 
 @code {
    [Parameter]
@@ -81,15 +97,26 @@ else
     }
 
     async Task HandleSubmit()
-    {
-        if (Id == null)
-        {
-            await ProvinceService.CreateProvince(province);
-        }
-        else
-        {
+    {    
+         if (Id == null)
+         {
+            try
+            {
+               await ProvinceService.CreateProvince(province);
+
+               await JsRuntime.InvokeVoidAsync("alert", "Saved Successfully!");
+               NavigationManager.NavigateTo("provinces");
+            }
+            catch (Exception ex)
+            {
+               ErrorMessage = "Please fill in all required fields.";
+            }
+         }
+         else
+         {
             await ProvinceService.UpdateProvince(province);
-        }
+            await JsRuntime.InvokeVoidAsync("alert", "Updated Successfully!");
+         }
     }
 
     async Task DeleteProvince()

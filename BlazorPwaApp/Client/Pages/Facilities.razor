@@ -1,4 +1,6 @@
 ﻿@page "/facilities"
+@using BlazorPwaApp.Shared.Entities;
+@layout MainLayout
 @inject IFacilityService FacilityService
 @inject IJSRuntime js
 @inject NavigationManager NavigationManager
@@ -7,53 +9,113 @@
 
 <h3>Facilities</h3>
 
-<button class="btn btn-primary" @onclick="CreateNewFacility">Create New Facility</button>
+@*<button class="btn btn-primary" @onclick="CreateNewFacility">Create New Facility</button>*@
 
-<table class="table">
+<div class="row">
+   <div class="col-md-8">
+      <button class="btn btn-primary" @onclick="CreateNewFacility"><i class="fas fa-user-plus"></i> Create New Facility</button>
+   </div>
 
-   <thead>
-      <tr>
-         <th>Country</th>
-         <th>Province</th>
-         <th>District</th>
-         <th>Facility</th>
-         <th>HMIS Code</th>
-         <th>Latitude</th>
-         <th>Longitude</th>
-         <th>Private Facility</th>
-         <th></th>
-      </tr>
-   </thead>
-
-   <tbody>
-      @foreach (var facility in FacilityService.Facilities)
+   <div class="input-group col">
+      <input type="text" class="form-control" placeholder="Search facility by name"
+      @bind="SearchString" @bind:event="oninput" @onkeyup="FilterFacility" />
+      @if (SearchString.Length > 0)
       {
-         <tr>
-            <td>@(facility?.District?.Province?.Country?.CountryName ?? "N/A")</td>
-            <td>@(facility?.District?.Province?.ProvinceName ?? "N/A")</td>
-            <td>@facility.District.DistrictName</td>
-            <td>@facility.FacilityName</td>
-            <td>@facility.HMISCode</td>
-            <td>@facility.Latitude</td>
-            <td>@facility.Longitude</td>
-            <td>
-               <span>@(facility.IsPrivateFacility ? "Yes" : "No")</span>
-            </td>
-            <td>
-               <button class="btn btn-primary" @onclick="(() => ShowFacility(facility.Oid))"><i class="oi oi-pencil"></i></button>
-               <button type="button" class="btn btn-danger mx-2" @onclick="(() => ConfirmDelete(facility.Oid, facility.FacilityName))"><i class="oi oi-delete"></i></button>
-            </td>
-         </tr>
+         <div class="input-group-append">
+            <button class="btn btn-danger" @onclick="ResetSearch" style="font-size: 12px; margin-top: 5px; margin-left: 5px;">
+               <i class="oi oi-reload"></i>
+            </button>
+         </div>
       }
-   </tbody>
+   </div>
+</div>
 
-</table>
+@if (list != null)
+{
+   <table class="table">
+
+      <thead>
+         <tr>
+            <th>Country</th>
+            <th>Province</th>
+            <th>District</th>
+            <th>Facility</th>
+            <th>HMIS Code</th>
+            @*<th>Latitude</th>
+            <th>Longitude</th>*@
+            <th>Private Facility</th>
+            <th></th>
+         </tr>
+      </thead>
+
+      <tbody>
+         @foreach (var facility in list)
+         {
+            <tr>
+               <td>@(
+                  facility?.District?.Province?.Country?.CountryName ?? "N/A"
+                  )
+               </td>
+               <td>@(
+                  facility?.District?.Province?.ProvinceName ?? "N/A"
+                  )
+               </td>
+               <td>@facility.District.DistrictName</td>
+               <td>@facility.FacilityName</td>
+               <td>@facility.HMISCode</td>
+               @*<td>@facility.Latitude</td>
+               <td>@facility.Longitude</td>*@
+               <td>
+                  <span>@(
+                   facility.IsPrivateFacility ? "Yes" : "No"
+                   )</span>
+               </td>
+               <td>
+                  <button class="btn btn-primary" @onclick="(() => ShowFacility(facility.Oid))"><i class="oi oi-pencil"></i></button>
+                  <button type="button" class="btn btn-danger mx-2" @onclick="(() => ConfirmDelete(facility.Oid, facility.FacilityName))"><i class="oi oi-delete"></i></button>
+               </td>
+            </tr>
+         }
+      </tbody>
+
+   </table>
+}
 
 @code {
+   protected List<Facility> list = new List<Facility>();
+   protected List<Facility> searchFacilityData = new();
+   protected string SearchString { get; set; } = string.Empty;
+
    protected override async Task OnInitializedAsync()
    {
-      await FacilityService.GetFacilities();
+      await LoadDistricts();
    }
+
+   private async Task LoadDistricts()
+   {
+      var facilities = await FacilityService.GetFacilities();
+      list = facilities;
+      searchFacilityData = facilities;
+   }
+
+   protected void FilterFacility()
+   {
+      if (!string.IsNullOrEmpty(SearchString))
+         list = searchFacilityData.Where(x => x.FacilityName.IndexOf(SearchString, StringComparison.OrdinalIgnoreCase) != -1).ToList();
+      else
+         list = searchFacilityData;
+   }
+
+   public void ResetSearch()
+   {
+      SearchString = string.Empty;
+      list = searchFacilityData;
+   }
+
+   //protected override async Task OnInitializedAsync()
+   //{
+   //   await FacilityService.GetFacilities();
+   //}
 
    void ShowFacility(int id)
    {
@@ -65,18 +127,16 @@
       NavigationManager.NavigateTo("/createfacility");
    }
 
-   //async Task DeleteFacility(int facilityId)
-   //{
-   //   await FacilityService.DeleteFacility(facilityId);
-   //   await FacilityService.GetFacilities();
-   //}
-
    async Task ConfirmDelete(int id, string facility)
    {
       if (await js.InvokeAsync<bool>("confirm", $"Do you want to delete {facility}'s ({id}) Record?"))
       {
          await FacilityService.DeleteFacility(id);
-         await FacilityService.GetFacilities();
+         
+         var deletedFacility = list.FirstOrDefault(c => c.Oid == id);
+
+         if (deletedFacility != null)
+            list.Remove(deletedFacility);
       }
    }
 }
